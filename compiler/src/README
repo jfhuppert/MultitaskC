@@ -1,0 +1,3 @@
+Just type make to compile it.
+You need to have bison, flex, awk installed.
+It has been tested only with 32 bit gcc so if you have a 64 bit one you may have to add "-m32" flag.
