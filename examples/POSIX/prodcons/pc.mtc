@@ -1,0 +1,78 @@
+/*------------------------------------------------------------------------------*/
+/*
+   pc.ec
+*/
+/*------------------------------------------------------------------------------*/
+
+extern int getpid(void);
+extern void srandom(unsigned int seed);
+extern int sscanf(const char *str, const char *format, ...);
+extern void exit(int c);
+extern int printf(char *fmt, ...);
+
+#define FOREVER   for(;;)
+#define QSIZE      5
+
+#ifdef STATIC
+#include "spc.h" /* Comunications statiques. */
+#else
+#include "dpc.h" /* Comunications dynamiques. */
+#endif
+
+extern long
+   random(); /* Fonction de generation de nombres aleatoires. */
+
+/*--------------------------------------------------------------------------*/
+prod(i)
+int
+   i;
+{
+   printf("prod(%d)\n",i);
+}
+/*--------------------------------------------------------------------------*/
+cons(i)
+int
+   i;
+{
+   printf("cons(%d)\n",i);
+}
+/*--------------------------------------------------------------------------*/
+main(argc,argv)
+int
+   argc;
+
+char
+   *argv[];
+{
+int
+   max;
+
+_QDeclaration(iq,int,QSIZE); /* Declaration de la file. */
+
+   /* Recuperation des parametres. */
+   if(argc!=2) exit(1);
+   if(sscanf(argv[1],"%d",&max)!=1) exit(1);
+
+   srandom(getpid()); /* Initialisation du generateur de nombres. */
+   _QInit(iq); /* Initialisation de la file. */
+
+   block(pc) {
+      execute { int val;
+         FOREVER {
+            val=random()&0xff; /* Tirage au sort d'une valeur. */
+            _QPost(iq,val); /* On depose la valeur dans la file. */
+            prod(val);
+         }
+      }
+      and
+      execute { int i,val;
+         for(i=0;i<max;i++) {
+            _QPend(iq,val);    /* Attente d'une valeur dans la file. */
+            cons(val);
+         }
+         break(pc); /* Terminaison de tout le programme. */
+      }
+      and _QUse(iq); /* Tache de gestion de la file (seulement en mode "STATIC"). */
+   }
+}
+/*--------------------------------------------------------------------------*/
