@@ -18,6 +18,7 @@
 # along with MultitaskC.  If not, see <http://www.gnu.org/licenses/>.
 
 CC=gcc
+# LDFLAGS=-m32
 LDFLAGS=
 
 BTFACT=-DBTFACT
@@ -34,6 +35,7 @@ $(ODIR)/auto.o $(ODIR)/gfork.o $(ODIR)/sfork.o $(ODIR)/ifork.o $(ODIR)/erstr.o \
 $(ODIR)/pcsynan.o $(ODIR)/symset.o $(ODIR)/pclexan.o
 
 CFLAGS= -I$(IDIR) -O2 $(BTFACT) -fno-builtin
+#CFLAGS= -I$(IDIR) -O2 $(BTFACT) -fno-builtin -m32
 #CFLAGS= -I$(IDIR) -g $(BTFACT)
 #CFLAGS= -I$(IDIR)
 

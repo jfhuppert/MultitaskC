@@ -1,5 +1,6 @@
 Just type make to compile it.
 You need to have bison, flex, awk installed.
-It has been tested only with 32 bit gcc so if you have a 64 bit one you may have to add "-m32" flag.
+It works with 32 bit gcc.
+If you have a 64 bit one you may have to add "-m32" flag for LDFLAGS and CFLAGS and install "gcc-multilib" package.
 To install it copy ../bin/mtcc to a directory that is in your PATH before testing examples.
 Then make clean.
