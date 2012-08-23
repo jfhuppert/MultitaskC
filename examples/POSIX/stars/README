@@ -1,1 +1,1 @@
-To execute it just try : "xterm -fn 7x14 -geometry 132x40 -e ./p0"
+To execute it just try : "xterm -fn 7x14 -geometry 128x15 -e ./p0"

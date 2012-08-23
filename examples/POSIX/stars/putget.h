@@ -5,7 +5,7 @@
 /*------------------------------------------------------------------------------*/
 
 extern void puthex(unsigned long v);
-extern void putdec(long number);
+extern void putdec(unsigned long number);
 extern void putstr(char *s);
 
 /*------------------------------------------------------------------------------*/

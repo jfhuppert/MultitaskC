@@ -9,9 +9,9 @@
 extern int printf(const char *format, ...);
 
 /*------------------------------------------------------------------------------*/
-void putdec(long number)
+void putdec(unsigned long number)
 {
-   printf("%ld",number);
+   printf("%lu",number);
 }
 /*------------------------------------------------------------------------------*/
 void puthex(unsigned long v)
