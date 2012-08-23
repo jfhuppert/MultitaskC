@@ -1,6 +1,14 @@
+Under Linux (tested with debian squeeze i386 and ubuntu amd64) :
+You need to have bison, flex, gawk installed.
 Just type make to compile it.
-You need to have bison, flex, awk installed.
 It works with 32 bit gcc.
 If you have a 64 bit one you may have to add "-m32" flag for LDFLAGS and CFLAGS and install "gcc-multilib" package.
 To install it copy ../bin/mtcc to a directory that is in your PATH before testing examples.
 Then make clean.
+
+Under Windows (tested with cygwin latest version) :
+You need to have bison, flex, gawk and make installed. Also gcc-core (may test soon with mingw).
+Just type make to compile it.
+To install it copy ../bin/mtcc.exe to a directory that is in your PATH before testing examples.
+Then make clean.
+Go to /lib and create a symbolic link called "cpp" to ../usr/bin/cpp.
