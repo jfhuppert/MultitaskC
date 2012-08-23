@@ -21,9 +21,9 @@ volatile unsigned long i;\
    for(;;) {\
       group {\
 		   putstr("\x1b[");\
-         putdec(l);\
+         putdec(l+1);\
          putstr(";");\
-         putdec(c);\
+         putdec(c+1);\
          putstr("H");\
 		   if(t&0x1) putstr("\x1b[33m");\
 		   else putstr("\x1b[34m");\
