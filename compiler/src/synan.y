@@ -15,7 +15,7 @@ dans les blocks d'une fonction.
  *
  * This file is part of the MultitaskC project.
  *
- * Foobar is free software: you can redistribute it and/or modify
+ * MultitaskC is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
