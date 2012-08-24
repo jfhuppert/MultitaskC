@@ -1,1 +1,6 @@
 To execute it just try : "xterm -fn 7x14 -geometry 128x16 -e ./p0" and you will see 2048 stars, one per task.
+Under cygwin you can use " mintty --size 128,16 ./p0" if you don't have xterm.
+
+In the Makefile, the mtcc command is used with -e option for runtime synchronous product. You can try to remove
+the -e option to use compile time synchronous product and see the difference. The complexity of runtime synchronous
+product is exponential and you may not have a result at all.
