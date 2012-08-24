@@ -1,4 +1,4 @@
-Under Linux (tested with debian squeeze i386 and ubuntu amd64) :
+Under Linux (tested with debian squeeze i386 and ubuntu amd64, also tested under CERN scientific Linux) :
 You need to have bison, flex, gawk installed.
 Just type make to compile it.
 It works with 32 bit gcc.
