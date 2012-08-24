@@ -1,5 +1,5 @@
-For vim syntax coloring copy mtc.vim in /usr/share/vim/vimcurrent/syntax directory.
+For vim syntax coloring copy mtc.vim in /usr/share/vim/vimcurrent/syntax directory for Linux or /usr/share/vim/vim73/syntax under cygwin.
 
-Then edit /usr/share/vim/vimcurrent/filetype.vim and add these 2 lines :
+Then edit /usr/share/vim/vimcurrent/filetype.vim or /usr/share/vim/vim73/filetype.vim and add these 2 lines :
 " MultitaskC
 au BufNewFile,BufRead *.llC,*.ec,*.mtc          setf mtc
