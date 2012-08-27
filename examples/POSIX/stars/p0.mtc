@@ -18,22 +18,22 @@ static char cchr[]="-/-|-\\";
 {\
 unsigned long t=0;\
 volatile unsigned long i;\
-   for(;;) {\
-      group {\
-		   putstr("\x1b[");\
-         putdec(l+1);\
-         putstr(";");\
-         putdec(c+1);\
-         putstr("H");\
-		   if(t&0x1) putstr("\x1b[33m");\
-		   else putstr("\x1b[34m");\
-         putchar('*');\
-      }\
-      t+=1;\
-      if(t==6) t=0;\
-      i=(((unsigned long)rand())%(unsigned long)0x100); \
-      for(;i>0;i--); \
-   }\
+	for(;;) {\
+		group {\
+			putstr("\x1b[");\
+			putdec(l+1);\
+			putstr(";");\
+			putdec(c+1);\
+			putstr("H");\
+			if(t&0x1) putstr("\x1b[33m");\
+			else putstr("\x1b[34m");\
+			putchar('*');\
+		}\
+		t+=1;\
+		if(t==6) t=0;\
+		i=(((unsigned long)rand())%(unsigned long)0x100); \
+		for(;i>0;i--); \
+	}\
 }
 /*------------------------------------------------------------------------------*/
 void p0(void)
