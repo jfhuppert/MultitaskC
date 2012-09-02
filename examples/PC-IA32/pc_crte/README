@@ -4,3 +4,4 @@ Type make and you will get a "standalone.iso" you can use to boot a VirtualBox m
 It should work for a real target you can boot via PXE and i will test it soon.
 In the main.c file you have a "_main()" function which is the entry point after startup code and basic hardware initialization.
 Typicaly you can compile a MultitaskC file with a function you can call from "_main()" to get a native multitask application run.
+Tested under linux with gcc version 4.4.5 (Debian 4.4.5-8), tried under cygwin but does not work for the moment.
