@@ -1,0 +1,175 @@
+/*--------------------------------------------------------------------------*/
+/*
+	main.llC
+*/
+/*--------------------------------------------------------------------------*/
+
+#include <main.h>
+#include "httpd.h"
+#include <queue.h>
+#include <iofuncs.h>
+#include <cs8900.h>
+#include <MC68VZ328.h>
+
+extern void banner(void);
+
+#include "lwip/debug.h"
+#include "lwip/mem.h"
+#include "lwip/memp.h"
+#include "lwip/sys.h"
+#include "lwip/stats.h"
+#include "lwip/tcpip.h"
+#include "netif/uCcs8900.h"
+#include "lwip/ip_addr.h"
+#include "lwip/api.h"
+
+#define MAXBSIZE 1024
+static unsigned char ibuffer[MAXBSIZE];
+static unsigned char obuffer[MAXBSIZE];
+
+/*--------------------------------------------------------------------------*/
+void _main(void)
+{
+int 
+	reg;
+
+struct ip_addr
+	ipaddr,
+	netmask,
+	gw;
+
+struct netif
+	*uCcs8900if;
+
+volatile unsigned long
+	slow_time,
+	fast_time;
+		
+_QDeclaration(tcpip_msgq,struct api_msg *,QSIZE);
+
+	banner();
+
+	_QInit(tcpip_msgq);
+
+	dbg_putstr("calling sys_init()\r\n");
+	sys_init();
+	dbg_putstr("calling mem_init()\r\n");
+	mem_init();
+	dbg_putstr("calling memp_init()\r\n");
+	memp_init();
+	dbg_putstr("calling pbuf_init()\r\n");
+	pbuf_init();
+	dbg_putstr("calling ip_init()\r\n");
+	ip_init();
+	dbg_putstr("calling udp_init()\r\n");
+	udp_init();
+	dbg_putstr("calling tcp_init()\r\n");
+	tcp_init();
+	dbg_putstr("calling httpd_init()\r\n");
+	httpd_init();
+	dbg_putstr("init done\r\n");
+
+        networkp_init(&ipaddr,&netmask,&gw);
+
+	dbg_putstr("calling netif_add()\r\n");
+	uCcs8900if=netif_add(&ipaddr,&netmask,&gw,uCcs8900_init,ip_input);
+	dbg_putstr("calling netif_set_default()\r\n");
+	netif_set_default(uCcs8900if);
+	dbg_putstr("interface registration done\r\n");
+
+	slow_time=0;
+	fast_time=0;
+
+	block(all) {
+		execute {
+			execute {
+				FOREVER {
+					group {
+						if(fast_time>4000) { tcp_fasttmr(); fast_time=0; }
+						if(slow_time>8000) { tcp_slowtmr(); slow_time=0; }
+						fast_time++;
+						slow_time++;
+						uCcs8900_input(uCcs8900if);
+					}
+				}
+			}
+			and {
+				struct api_msg *msg;
+				FOREVER {
+					_QPend(tcpip_msgq,msg);
+					/* group { putstr("got a msg 0x"); puthex((unsigned long)msg); putstr("\r\n"); } */
+					api_msg_input(msg);
+				}
+			}
+		}
+		and execute {
+			struct netconn *_conn, *_newconn;
+			err_t res;
+			struct netbuf *_buf;
+			u32_t _len;
+			u32_t _olen;
+			s8_t _err;
+			_conn=netconn_new(NETCONN_TCP);
+			netconn_bind(res,_conn,NULL,23);
+			netconn_listen(res,_conn);
+			FOREVER {
+				netconn_accept(_newconn,_conn);
+				if(_newconn!=NULL) {
+					putstr("new connection\r\n");
+					do {
+			                  _olen=0;
+					  netconn_recv(_buf,_newconn);
+					  group {
+					    if(_buf!=NULL) {
+					      netbuf_copy(_buf,ibuffer,MAXBSIZE);
+					      _len=netbuf_len(_buf);
+					      netbuf_delete(_buf);
+					      if(_len>=2) {
+					        if(ibuffer[0]!=0xff && ibuffer[1]!=0xfe) {
+					          if(ibuffer[0]=='q') _buf=NULL;
+					          else if(ibuffer[0]=='Q') _buf=NULL;
+					          else {
+					            putstr("received <");
+					            ibuffer[_len-2]='\0';
+					            putstr(ibuffer);
+					            putstr(">\r\n");
+					            bcopy("received <",obuffer,10);
+					            bcopy(ibuffer,obuffer+10,_len-2);
+					            bcopy(">\r\n% ",obuffer+(10+(_len-2)),5);
+					            _olen=(10+(_len-2))+5;
+					          }
+					        }
+					        else {
+					          putstr("ready\r\n");
+					          bcopy("% ",obuffer,2);
+					          _olen=2;
+					        }
+					      }
+					    }
+					  }
+			                  if(_olen!=0) {
+					    netconn_write(res,_newconn,obuffer,_olen,NETCONN_NOCOPY);
+				          }
+					} while(_buf!=NULL);
+					putstr("connection closed\r\n");
+					netconn_close(res,_newconn);
+					netconn_delete(res,_newconn);
+				}
+				if(ibuffer[0]=='Q') break;
+			}
+			netconn_close(res,_conn);
+			netconn_delete(res,_conn);
+			break(all);
+		}
+		and execute {
+			volatile unsigned long delay;
+			group { PDSEL|=0x01; PDDIR|=0x01; }
+			FOREVER {
+				PDDATA^=0x01;
+				for(delay=0;delay<0x800;) delay++;
+			}
+		}
+		and _QUse(tcpip_msgq);
+	}
+}
+/*--------------------------------------------------------------------------*/

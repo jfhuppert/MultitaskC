@@ -1,0 +1,120 @@
+/*--------------------------------------------------------------------------*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#define FOREVER				for(;;)
+#define QSIZE				5
+
+#include "spc.h" /* Comunications statiques. */
+
+#include "MC68VZ328.h"
+
+extern void putchr(char c);
+extern char getchr(void);
+extern char nb_getchr(void);
+extern void putstr(char *s);
+extern void print(char *m,unsigned long v);
+extern void puthex(unsigned long val);
+extern void banner(void);
+
+static char message1[]="Command 0x";
+static char message2[]="\r\n";
+
+/*--------------------------------------------------------------------------*/
+void _main(void)
+{
+_QDeclaration(iq,unsigned long,QSIZE);
+_QDeclaration(oq,unsigned long,QSIZE);
+
+	putstr("[H[2J");
+	banner();
+
+	_QInit(iq);
+	_QInit(oq);
+
+	block(pc) {
+
+		execute { unsigned long val;
+			FOREVER {
+				while((val=nb_getchr())==0);
+				_QPost(iq,val);
+			}
+		}
+		and
+		execute { unsigned long val;
+			FOREVER {
+				_QPend(oq,val);
+				putchr(val);
+			}
+		}
+		and execute { _QUse(iq); }
+		and execute { _QUse(oq); }
+
+		and execute {
+
+			unsigned long val;
+
+			FOREVER {
+
+				_QPend(iq,val);
+				if(val=='R') break(pc);
+
+				{
+					char *str=message1;
+					while(*str) {
+						_QPost(oq,*str);
+						str++;
+					}
+			
+				}
+
+				{
+					unsigned char buf[10];
+					char *str=buf;
+					int i;
+
+					for(i=7;i>=0;i--) {
+						buf[i]="0123456789ABCDEF"[val&0x0F];
+						val>>=4;
+					}
+					buf[8]='\0';
+
+					while(*str) {
+						_QPost(oq,*str);
+						str++;
+					}
+			
+				}
+
+				{
+					char *str=message2;
+					while(*str) {
+						_QPost(oq,*str);
+						str++;
+					}
+			
+				}
+
+			}
+
+		}
+		and {
+
+			volatile unsigned long delay;
+
+			PDSEL |= 0x01;
+			PDDIR |= 0x01;
+
+			FOREVER {
+
+				PDDATA ^= 0x01;
+				for(delay=0;delay<0x1000;) delay++;
+
+			}
+
+		}
+	}
+}
+/*--------------------------------------------------------------------------*/

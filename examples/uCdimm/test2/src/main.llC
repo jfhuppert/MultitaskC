@@ -1,0 +1,73 @@
+/*--------------------------------------------------------------------------*/
+
+#include <main.h>
+#include <queue.h>
+#include <iofuncs.h>
+#include <cs8900.h>
+#include <MC68VZ328.h>
+
+static char pkt_out[2048];
+unsigned short pkt_out_length;
+
+static char pkt_in[2048];
+unsigned short pkt_in_length;
+
+/* char dest_addr[ETH_ALEN] = { 0x00,0x48,0x54,0x5A,0x78,0x07 }; */
+char dest_addr[ETH_ALEN] = { 0x00,0x40,0x05,0x1E,0xF8,0x44 };
+
+char test_packet[] = { 0,0,0,0,0,0, 0,0,0,0,0,0,
+		 0, 46, /* A 46 in network order */
+		 0, 0, /* DSAP=0 & SSAP=0 fields */
+		 0xf3, 0 /* Control (Test Req + P bit set) */ };
+
+/*--------------------------------------------------------------------------*/
+void _main(void)
+{
+int 
+	reg;
+
+	putstr("[H[2J");
+	banner();
+	reg=cs8900_probe();
+	putstr("cs8900_probe()==");
+	puthex(reg);
+	putstr("\r\n");
+	reg=cs8900_open();
+	putstr("cs8900_open()==");
+	puthex(reg);
+	putstr("\r\n");
+
+	block(pc) {
+
+		execute {
+			FOREVER {
+				while(nb_getpkt(pkt_in,&pkt_in_length)==0);
+				print("Got a packet with size",(unsigned long)pkt_in_length);
+				pkt_dump(pkt_in,pkt_in_length);
+			}
+		}
+		and
+		execute {
+			memcpy(test_packet,dest_addr,ETH_ALEN);
+			pkt_out_length=sizeof(test_packet);
+			FOREVER {
+				while(nb_getchr()==0);
+				while(nb_putpkt(test_packet,pkt_out_length)==0);
+				print("Sent a packet with size",(unsigned long)pkt_out_length);
+				pkt_dump(test_packet,pkt_out_length);
+			}
+		}
+		and {
+			volatile unsigned long delay;
+			PDSEL |= 0x01;
+			PDDIR |= 0x01;
+			FOREVER {
+				PDDATA ^= 0x01;
+				for(delay=0;delay<0x1000;) delay++;
+			}
+		}
+
+	}
+
+}
+/*--------------------------------------------------------------------------*/

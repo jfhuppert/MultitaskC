@@ -1,0 +1,61 @@
+/*----------------------------------------------------------------------------*/
+/* Just a simple program.                                                     */
+/*----------------------------------------------------------------------------*/
+
+extern void putchr(char c);
+extern char getchr(void);
+extern char nb_getchr(void);
+extern void putstr(char *s);
+extern void print(char *m,unsigned long v);
+extern void puthex(unsigned long val);
+extern void banner(void);
+
+/*----------------------------------------------------------------------------*/
+void _main(void)
+{
+meeting
+	gotone:2;
+
+meeting
+	release:2;
+
+unsigned long
+	reg;
+
+	putstr("[H[2J");
+	banner();
+
+	block(all) {
+		execute {
+			for(;;) {
+				while((reg=nb_getchr())==0);
+				join(gotone);
+				join(release);
+				if(reg=='R') break;
+			}
+			break(all);
+		}
+		and {
+			volatile unsigned long timeout;
+			volatile unsigned long count=0;
+			char cmd;
+			for(;;) {
+				putstr("\rLoop count is 0x");
+				puthex(count);
+				for(timeout=0;timeout<0x10000;) {
+					timeout+=1;
+					when(gotone) {
+						cmd=reg;
+						putstr(" Command 0x");
+						puthex((unsigned long)cmd);
+						join(release);
+					}
+				}
+				count+=1;
+			}
+		}
+	}
+
+	return;
+}
+/*----------------------------------------------------------------------------*/

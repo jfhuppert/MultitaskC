@@ -1,0 +1,150 @@
+/*--------------------------------------------------------------------------*/
+/*
+	main.mtc
+*/
+/*--------------------------------------------------------------------------*/
+
+#include <main.h>
+#include <queue.h>
+#include <iofuncs.h>
+#include <cs8900.h>
+#include <MC68VZ328.h>
+
+extern void banner(void);
+
+#include "lwip/debug.h"
+#include "lwip/mem.h"
+#include "lwip/memp.h"
+#include "lwip/sys.h"
+#include "lwip/stats.h"
+#include "lwip/tcpip.h"
+#include "netif/uCcs8900.h"
+#include "lwip/ip_addr.h"
+#include "lwip/api.h"
+#include "lwip/err.h"
+
+#define MAXBSIZE 1024
+static unsigned char ibuffer[MAXBSIZE];
+static unsigned char obuffer[MAXBSIZE];
+
+/*--------------------------------------------------------------------------*/
+void _main(void)
+{
+int 
+	reg;
+
+struct ip_addr
+	ipaddr,
+	netmask,
+	gw,
+	dipaddr;
+
+struct netif
+	*uCcs8900if;
+
+volatile unsigned long
+	slow_time,
+	fast_time;
+		
+_QDeclaration(tcpip_msgq,struct api_msg *,QSIZE);
+
+	banner();
+
+	_QInit(tcpip_msgq);
+
+	dbg_putstr("calling sys_init()\r\n");
+	sys_init();
+	dbg_putstr("calling mem_init()\r\n");
+	mem_init();
+	dbg_putstr("calling memp_init()\r\n");
+	memp_init();
+	dbg_putstr("calling pbuf_init()\r\n");
+	pbuf_init();
+	dbg_putstr("calling ip_init()\r\n");
+	ip_init();
+	dbg_putstr("calling udp_init()\r\n");
+	udp_init();
+	dbg_putstr("calling tcp_init()\r\n");
+	tcp_init();
+	dbg_putstr("init done\r\n");
+
+  networkp_init(&ipaddr,&netmask,&gw,&dipaddr);
+
+	dbg_putstr("calling netif_add()\r\n");
+	uCcs8900if=netif_add(&ipaddr,&netmask,&gw,uCcs8900_init,ip_input);
+	dbg_putstr("calling netif_set_default()\r\n");
+	netif_set_default(uCcs8900if);
+	dbg_putstr("interface registration done\r\n");
+
+	slow_time=0;
+	fast_time=0;
+
+	block(all) {
+		execute {
+			execute {
+				FOREVER {
+					group {
+						if(fast_time>4000) { tcp_fasttmr(); fast_time=0; }
+						if(slow_time>8000) { tcp_slowtmr(); slow_time=0; }
+						fast_time++;
+						slow_time++;
+						uCcs8900_input(uCcs8900if);
+					}
+				}
+			}
+			and {
+				struct api_msg *msg;
+				FOREVER {
+					_QPend(tcpip_msgq,msg);
+					api_msg_input(msg);
+				}
+			}
+		}
+		and execute {
+
+			struct netconn *_conn;
+			err_t _res;
+			struct netbuf *_buf;
+			u32_t _len;
+			u16_t remote_port;
+
+			FOREVER {
+
+				putstr("\r\nPress any key to get time of day > ");
+				while(nb_getchr()==0);
+
+				_conn=netconn_new(NETCONN_TCP);
+				remote_port=htons(13);
+				netconn_connect(_res,_conn,&dipaddr,remote_port);
+				if(_res<0) {
+					putstr(lwip_strerr(_res));
+					putstr("\r\n");
+				}
+				else {
+					netconn_recv(_buf,_conn);
+					netbuf_copy(_buf,ibuffer,MAXBSIZE);
+					_len=netbuf_len(_buf);
+					netbuf_delete(_buf);
+					ibuffer[_len]='\0';
+					putstr(ibuffer);
+				}
+	
+				// Currently bugged !! FIXIT
+				// netconn_close(_res,_conn);
+				// netconn_delete(_res,_conn);
+
+			}
+
+		}
+		and execute {
+			volatile unsigned long delay;
+			group { PDSEL|=0x01; PDDIR|=0x01; }
+			FOREVER {
+				PDDATA^=0x01;
+				for(delay=0;delay<0x800;) delay++;
+			}
+		}
+		and _QUse(tcpip_msgq);
+	}
+}
+/*--------------------------------------------------------------------------*/
