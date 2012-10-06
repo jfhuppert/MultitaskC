@@ -1,0 +1,53 @@
+/*
+   boom.mtc
+*/
+
+#include "boom.h"
+
+int main()
+{
+   execute {
+      execute {
+         execute {
+            execute { TASK(0); }
+            and { TASK(1); }
+         }
+         and {
+            execute { TASK(2); }
+            and { TASK(3); }
+         }
+      }
+      and {
+         execute {
+            execute { TASK(4); }
+            and { TASK(5); }
+         }
+         and {
+            execute { TASK(6); }
+            and { TASK(7); }
+         }
+      }
+   }
+   and {
+      execute {
+         execute {
+            execute { TASK(8); }
+            and { TASK(9); }
+         }
+         and {
+            execute { TASK(10); }
+            and { TASK(11); }
+         }
+      }
+      and {
+         execute {
+            execute { TASK(12); }
+            and { TASK(13); }
+         }
+         and {
+            execute { TASK(14); }
+            and { TASK(15); }
+         }
+      }
+   }
+}
