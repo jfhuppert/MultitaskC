@@ -3,3 +3,4 @@ The documentation is compiled with "texlive-full" package under debian.
 Changes should be made in "report.tex" file and/or "report.bib".
 The result is "report.pdf".
 The ".add" files are for vi spellchecking.
+This has been tested with "MiKTeX" under Windows 7.
