@@ -37,12 +37,17 @@ Email: hugo@delchini.fr\\
 
 \begin{abstract}
 
-Computing applications are often written using a high level computer language for programming and an
-operating system for execution handling. A family of programming languages (CPL for "Compiled Parallelism
-Languages") offers features and advantages similar to a programming language coupled with a multi-task
-operating system. We intend here to point out that CPLs bring several more advantages in term of performances
-especially for embedded real-time applications. As a demonstration, we developed two versions of the same application,
-first using a CPL and then using a common language coupled with an operating system. We then compare the respective performances.
+Computing applications are often written using a high level
+computer language for programming and an operating system for
+execution handling. A family of programming languages (CPL for
+"Compiled Parallelism Languages") offers features and advantages
+similar to a programming language coupled with a multi-task
+operating system. We intend here to point out that CPLs bring
+several additional advantages in terms of performance, especially
+for embedded real-time applications. As a demonstration, we
+developed two versions of the same application, first using a CPL
+and then using a common language coupled with an operating
+system. We then compare the respective performances.
 
 \end{abstract}
 
@@ -53,427 +58,630 @@ first using a CPL and then using a common language coupled with an operating sys
 \chapter{Introduction}
 \label{sec:intro}
 
-Industrial computing applications development is usually done by using a high level programming language
-and an operating system for execution control. An operating system offers services that the developer
-uses to implement an application on a computer.
+Software development for industrial applications is usually done
+using a high level programming language and an operating system
+for execution control. The operating system offers services that
+can be used to implement an application on a computer.
 
-The use of a high level programming language coupled to a multi-task operating system provides a comfortable
-means for application design and implementation, so that it seems difficult to do without. The pair enables you
-to produce applications largely independent from the hardware, maintenance and evolution of the software is made easier.
+Coupling high level language programming with a multi-task
+operating system provides comfortable means for application
+design and implementation, so that it seems difficult to do
+without. This pair enables you to produce applications largely
+independent from the hardware, maintenance and evolution of the
+software is made easier.
 
-A high level programming language family (that we will call CPL for "Compiled Parallelism Languages")
-that include operating system features (as tasks definition, task synchronizations and communications
-between tasks) gives, as we will see later, the same advantages than said before. It is admitted, from a
-theoretical point of view, as in~\cite{Halbwachs:91}, that these languages brings additional advantages
-in terms of portability, formal modeling and execution efficiency. This work is particularly focused on
-execution efficiency.
+A family of high level programming languages - called CPLs for
+"Compiled Parallelism Languages" - that include operating system
+features (such as tasks definition, task synchronizations and
+communications between tasks) provides the same advantages. It is
+admitted, from a theoretical standpoint, see~\cite{Halbwachs:91}, that
+these languages bring additional advantages in terms of
+portability, formal modeling and execution efficiency. This work
+is particularly focused on execution efficiency.
 
-We intend to show that the CPLs advantages versus the traditional "operating system/programming language"
-are significant and that they can be better to solve various problems.
+We intend to show that CPLs in practice really have significant
+advantages over the classical combination of tools and that using
+CPLs enables you to devise better solutions to various problems.
 
-Our evaluation will be done by first do a description of various traditional tools and operating systems
-used to build applications, specially in real-time and embedded space, this is in chapter~\ref{sec:related}.
-We will point out the main characteristics of common applications and classical tools allowing their design
-and implementation with respect of their constraints.
+In chapter~\ref{sec:related} we describe various traditional tools
+and operating systems used to build applications, specially in
+the real-time and embedded domain. We will point out the main
+characteristics of common applications and how classical tools
+deal with their constraints.
 
-Then, in chapter~\ref{sec:cp} we will introduce CPLs by a description of several existing languages and
-show that they have advantages for the implementation of embedded real-time applications. We will also
-introduce our CPL which is high performance oriented.
+In chapter~\ref{sec:cp} we introduce CPLs by describing several of
+the existing languages and we show their advantages in
+implementing embedded real-time applications. Then we present our
+CPL - MultitaskC - which is more particularly oriented towards
+high performance.
 
-In the last chapter~\ref{sec:evaluation} of this work, we will describe an embedded real-time application
-we choose because it is representative in terms of constraints. We will implement two versions of the
-application : one with an operating system and a high level programming language and the other one
-with the CPL we have defined. We will then compare representative results mainly about time and space
-performances.
+In the last chapter~\ref{sec:evaluation} we describe an embedded
+real-time application, chosen because it is representative in
+terms of constraints. We implement two versions of this
+application : one using an operating system and a
+high level programming language and the other using MultitaskC.
+Then we compare representative results in terms of time and
+memory space performances.
 
-Finally, chapter~\ref{sec:conclusion} concludes and suggests directions for further research.
+Finally, chapter~\ref{sec:conclusion} we conclude and suggest
+directions for further research.
 
 % ------------------------------------------------------
 \chapter{Several development solutions}
 \label{sec:related}
 
-There are several methods to program applications. Our purpose in this section is to list some of them that are
-representative of the ones used in industry for mono-processor or few processors machines. Applications are often
-developed using a cross compiler and binaries are loaded on the target system via an appropriate media such
-an USB link and a JTAG. Some real-time operating systems such as LynxOS allows the development environment to be
-used directly on the target system.
+There are several methods to program applications. Our purpose in
+this section is to list some of the most representative among
+those used for mono-processor or few-processors machines.
+Applications are often developed using a cross compiler with
+binary codes being loaded on the target system via a suitable
+media such an USB link or a JTAG. Some real-time operating
+systems such as LynxOS make the development environment directly
+available on the target system.
 
-We are going now to describe few development environment for applications. These solutions are applicable whether you use
-cross compilation or not.
+We are now going to describe a few development environments.
+These are usable whether you use cross-compilation or
+target-compilation.
 
 \section{Main characteristics of embedded real-time applications}
 
-Data acquisition applications described in~\cite{Delchini:95} and motor control applications we will describe later for
-evaluations always have a set of characteristics. The main ones we will consider are :
+Data acquisition applications as described in~\cite{Delchini:95} and
+motor-control applications that will be described here later
+share a set of characteristics. The main ones we will consider
+are :
 
 \begin{itemize}
 
-\item {\em The reaction to one or more input signals (event triggered)}. This is the case of a lot of industrial applications,
-they react to stimuli that triggers processing as data input or triggering other stimuli. When the application runs and is
-always ready to react to each stimulus without the introduction of a delay for following stimuli, it can be said to be a
-real-time one. In this case one can consider that the response of the application is synchronous with stimuli occurrences.
+\item {\em They react to one or more input signals (event-triggered)}. An
+  application which is able to process an event without delaying
+  the processing of further incoming events, is called a
+  real-time application. In this case the response of the
+  application can be considered synchronous with stimulus
+  occurrence.
 
-\item {\em Time triggered processing}. Very often in real time application, there are processes that must be executed
-at a precise rate. For example, in an electric motor control task, you usually have to implement a current control loop
-at a very high rate (typically 10 us cycle time). The stability of the rate is very important for the stability of the
-system and also it is better to be able to control the jitter between two time triggered processes.
+\item {\em They ensure precise clock-triggered processing}. Very often
+  some processes must be executed at a precise rate. For example,
+  for electric motor control, you usually have to execute a
+  current-control loop at a very high rate (typically 10 us cycle
+  time). The rate's stability is very important for the overall
+  system's stability. It may also be important to control
+  precisely the delay between two separate clock-triggered
+  processes.
 
-\item {\em Non triggered processing}. Most applications need the possibility to specify that a particular process need to be
-done as fast as possible or when there is time to do it.
+\item {\em They fulfill non-triggered servicing}. Most applications need
+  the possibility to specify whether a particular process needs
+  to be executed as fast as possible or only when
+  there is time to do it.
 
-\item {\em Several more or less independent processing}. Applications are often made of more that one independent tasks
-communicating via standard mechanisms for mutual exclusion and synchronization for example. In a data acquisition system
-one task can do data readout and another data transfers for centralization. This can allow to operate for example
-independent hardware simultaneously and so reduce dead time (an asynchronous interface between two buses). The possibility
-for the programmer to specify tasks is also convenient for application design. Tasks can be non triggered, time triggered
-or event triggered.
+\item {\em They support concurrent processing}. Applications often consist
+  of several more or less independent tasks communicating via
+  standard mechanisms of mutual exclusion and synchronization.
+  For example, in a data acquisition application one task will do
+  data readout and another one data transfers. This way
+  independent hardwares can be operated simultaneously and the
+  total dead time is reduced (provided asynchronous interfaces
+  are available). For maximal efficiency the programmer should be
+  able to specify each task individually as non-triggered,
+  clock-triggered or event-triggered.
 
-\item {\em The use of specific hardware}. In real time systems for motor control as an example, one is going to use
-a particular electric motor with characteristics that have an impact on the control software. Interfaces between the
-microprocessor and an H-bridge for current control is usually a Pulse Width Modulation module that can be very different
-from one hardware platform to another. The hardware can be also specifically developed for the application. The programming
-environment should make easier the use of particular hardware.
+\item {\em They interface with specific hardwares}. Real-time systems for
+  apparatus control deal with varied hardwares whose
+  characteristics have profound impact on the software.
+  Interfaces between the processor and the hardware thus are
+  usually quite different from one platform to the other, and it
+  is very important that the programming environment makes it
+  easy to develop and use specific hardware interfaces.
 
 \end{itemize}
 
 \section{A standalone programming language}
 
-This first approach is the oldest one. One can consider that a lot of embedded applications have been programmed with it.
-It consist in using a mix of a high level programming language and eventually assembler parts that is executed without
-the control of an operating system. All must be written by the programmer that is not allowed to use complex objects
-for application design and structure (tasks, means of communication and synchronization, ...). Execution environment
-is reduced to hardware and eventually during the development phase, a debugger.
+This approach is the oldest one and many embedded applications
+have been programmed this way. It consists in using a high level
+programming language, possibly complemented with assembler parts,
+to write a code that is executed independently of any operating
+system. The programmer is in charge of everything and cannot use
+any of the complex objects devised for application design and
+structuring (tasks, means of communication and synchronization,
+...). The execution environment boils down to hardware and a
+possible debugger during the development phase.
 
-Actually, the main point here is the choice of the programming language. Choosing a standard high level programming
-language with as much as possible libraries that can eventually give some basic operating system features can be
-advantageous. The choice can be induced by the availability of a compiler for the hardware target. It can be reasonable
-to use a standardized programming language that is widely used.
+The main point here is choosing the right programming language. A
+standard high level programming language with many useful
+libraries, including if possible some libraries of basic
+operating system features, can be advantageous. However the
+choice may be limited by the availability of compilers for the
+hardware target. Whenever possible, a widely used standardized
+programming language makes a good choice.
 
-Several languages conforms to these criteria. The one we will retain is the C programming language described in~\cite{KR:88}
-or eventually the object oriented variant : C++. Note that concerning C++, the programmer should take care of objects
-resources such as memory, especially for constructors and destructors that can introduce an overhead during execution.
-Actually, all objects should be declared with static memory and no dynamic allocation should be used at least during
-execution, after initializations. Control of these costs can be hazardous when it is necessary in real-time applications
-to handle them precisely in order to be sure to suit all the constraints of the application.
+Several languages meet these criteria. We will retain C
+programming language, as described in [KR:88] and its object
+oriented variant C++. Note that when using C++ the programmer
+should pay attention to the resources (such as memory) required
+by each objects, especially for constructors and destructors, as
+the underlying management of these resources can introduce an
+important overhead during execution. Actually all objects should
+be declared as static memory and no dynamic allocation should be
+used, at least after initializations. In a real-time application
+these hidden costs can become hazardous, as it is difficult to
+control them precisely enough to be sure that the application's
+constraints will always be respected.
 
-Originally, the C programming language has been designed for operating system development. It is suitable for low level
-programming and this confirms that this can be a good choice because as said before, we are interested by industrial
-embedded real-time applications. Another good argument for the choice of this programming language is the availability
-of compilers for most processors. For example, the well known "gcc" compiler from GNU project can handle most common
-hardware and have options to be conform to ANSI standard. This compiler suite can also offer C++ support and even
-other common languages such as FORTRAN. There is a standardized interface for debugging with "gdb" and binary tools
-for specific linking. Modern compilers are implementing very high level optimization techniques such as inter-procedural
-analysis for example.
+Originally, the C programming language has been designed for
+operating system development. It is fit for low level
+programming, and this why it makes a good choice for people
+interested as we are in industrial embedded real-time
+applications. The second important advantage is that C compilers
+are available for most processors. The well known "gcc" compiler
+from the GNU project for example can deal with most common
+hardware (moreover, it has options to be ANSI-standard
+compliant). This compiler suite also offers C++ support, together
+with other popular languages such as FORTRAN. A standardized
+debugging interface is provided with "gdb", as well as binary
+tools for specific linking. Like all modern compilers it
+implements very high level optimization techniques such as
+inter-procedural analysis, for example.
 
-Real-time embedded applications have been programmed very often without the use of an operating system for execution
-control. This programming method is used for a long time and applications written with it are mainly made of
-interrupts routines for event triggered processing. One interrupt can occur at a specific rate generated by a timer
-for time triggered processing. Other interrupts can indicate the availability of data or readiness for starting
-a data transfer.
+Many real-time embedded applications have been programmed without
+using an operating system for execution control. It is a long
+standing programming method. Applications written this way
+consist mainly of interrupt-routines dedicated to event-triggered
+processing. For clock-triggered processing, an interrupt can be
+generated by a timer at the desired rate . Other interrupts can
+be used to indicate the availability of input-data or to start a
+data transfer.
 
-Even if one uses a programming language such as C, some parts of the application must be developed in assembly language.
-Typically because some instructions or registers are specific to the processor and cannot exist at C level. Except by
-defining coding and precise application structure rules, the programmer is allowed to do whatever he wants and coding
-style could be a problem for maintenance and distributed programming in a programmers team. With this simple programming
-tool, it is possible to structure the application as a set of finite state automata for example or even Petri nets
-for multi-core architectures.
+High-level programming languages such as C don't dispense from
+writing some parts of the application in assembly language.
+Typically because some instructions or registers are
+processor-specific and cannot be dealt with by high-level
+languages. Unless coding and precise structuring rules are
+defined, the programmer is allowed to do whatever he wants. As a
+consequence diverging coding styles may become a problem,
+particularly in case of large team work, and more generally as
+far as maintenance is concerned. One can avoid such drawbacks
+however, since these simple programming tools make it easy to
+structure the application as a set of finite-state automata for
+example, or even Petri nets in case of multi-core architectures.
 
-This approach is quite basic but also used widely but the only thing we will retain is the use of the C programming
-language. We are now going to overview the use of this programming language along with an operating system.
+Such an approach, though quite basic, is widely used. The only
+point we'll keep in mind is the use of the C programming
+language. We are now going to give an overview of how to combine
+this programming language with an operating system.
+
 
 \section{A programming language with an operating system}
 
-Such a development environment is commonly used for several years in real-time space. More and more micro-controllers are
-able to run operating systems as there is more and more resources needed to do so. Lets see a sample of operating systems
-and other similar tools.
+Such a development environment has been commonly used for many
+years in the real-time community. More and more micro-controllers
+are able to run operating systems as the resources needed to do
+so are more and more available. Let's have a look at some
+operating systems and other similar tools. In each case we
+consider the programming language used is C.
 
-For each operating system we consider using the C programming language. We've chosen these mainly because they are
-representatives of the ones commonly used in industry. PharOS comes with its own programming language as we will see but
-it very close to C. We just want to cite OS9 that is an early real-time operating system but we'd like to concentrate
-on more recent ones. Note that VRTX is the VxWorks ancestor.
+They were chosen because they are representative of what is
+commonly used in the industry. PharOS comes with its own
+programming language, but the language is very similar to C. We
+mention OS9 which is an early real-time operating system but we'd
+like to focus on more recent ones. Note that VRTX is the ancestor
+of VxWorks.
 
-We will also do an overview of the ADA programming language. We will explain below why we consider this language as
-a language coupled to an operating system. In the section about development environments evaluation we will use
-PharOS with the PsyC programming language. In~\cite{Delchini:95} we have used VRTX and LynxOS with the C programming
-language. Also we have used C and C++ along with VxWorks in another evaluation we are going to describe shortly.
+We will also do an overview of the ADA programming language
+explain below why we consider it as a language coupled with an
+operating system. In the section dealing with development
+environments evaluation we consider PharOS with the PsyC
+programming language. In~\cite{Delchini:95} we use VRTX and LynxOS
+with the C programming language. Also we have used C and C++ with
+VxWorks in an other evaluation that will be described shortly.
 
 \subsection{VRTX}
 
-All informations we present here is taken from~\cite{VRTX:90} and~\cite{AMD29000:91}.
+All the information we present here is taken from~\cite{VRTX:90} and~\cite{AMD29000:91}.
 
-VRTX ("Versatile Real Time eXecutive") is a real-time fixed priority operating system designed to allow industrial applications
-development with respect of constraints in terms of performance and reactivity. It is made of a customizable kernel one can
-configure to fit exactly the application needs. We've made all the evaluation test on the version for the AMD29000 micro-processor
-but there are other version for common targets such MC68000 and others.
+VRTX ("Versatile Real Time eXecutive") is a real-time fixed
+priority operating system designed for industrial applications
+development with constraints in terms of performance and
+reactivity. It consists of a customizable kernel that can be
+configured to fit exactly the application's needs. We've did all
+the evaluation tests on a version customized for the AMD29000
+micro-processor but there are other version for common targets
+such MC68000 and others.
 
-Developments in C programming language is using a cross compiler on a PC. Applications are downloaded on the target via an
-industrial bus called VME. It is possible to get a on target environment for VRTX but this is not the case for our system.
-The main characteristics of this operating system are : mono-user system with multi-tasks capability and a fixed priority
-scheduler. There are three execution levels : supervisor mode, user mode and a mode for interrupt routines. The version used
-in~\cite{Delchini:95} of the operating system is sharing the physical address space with user tasks for data and instructions.
-There is no particular memory segmentation or virtualization and no memory protection via an MMU.
+Developments were done in C using a cross compiler on a PC.
+Application code is downloaded onto the target via an industrial
+bus called VME. An on-target environment for VRTX is also
+available but we didn't use it. The main characteristics of this
+operating system are : mono-user system with multi-tasks
+capability and a fixed priority scheduler. There are three
+execution levels : supervisor mode, user mode and a mode for
+interrupt routines. The version used in~\cite{Delchini:95} of the
+operating system shares the physical address space for data and
+instructions with user tasks. There is neither memory
+segmentation or virtualization nor memory protection via a MMU.
 
-It is possible to configure VRTX with paginated memory but it is not available by default. For performances issues we prefer
-to have simple memory management because the pages tables handling during contexts commutations can introduce system latency.
-This feature could however be interesting for safety as we will see with PharOS and LynxOS. The system can be flashed in ROM
-which is a common thing for embedded applications. Note that this have an impact on performances because ROM access time is
-usually really slower than RAM one.
+Configuring VRTX to support paginated memory is possible but this
+is not the option by default. For performance considerations we
+preferred to have simple memory management because pages' tables
+handling during contexts commutations introduces an additional
+system latency. This feature however could be interesting for
+safety reasons as we will see with PharOS and LynxOS. System code
+can be flashed into ROM, which is a common usage for embedded
+applications. Note that this has an impact on performances
+because ROM access time is usually really slower than RAM one.
 
-System calls are not conforms to any standard but the C compiler we use conforms to ANSI C. The kernel is available as assembly
-source file describing in a big data area the binary code of VRTX. This can be used to link the operating system with additional
-software such as drivers an startup code relative to the mother-board support. The board specific software has to be written
-by users and this allows to configure the kernel for a particular use. One must give several initialization information such
-as the maximum number of tasks, the size of stacks, etc. The development of this piece of software is not easy and when it is
-done, you still have to develop the entire application.
+System calls do not conform to any standard but the C compiler we
+use conforms to ANSI C. The kernel is available as an assembly
+source file describing in a big data area the binary code of VRTX
+. This can be used to link the operating system with additional
+software such as startup code relative to the mother-board support
+(board support package) and drivers. The board specific software
+has to be written by users and this allows to configure the kernel
+for a particular use. Several initialization informations must be
+defined, such as maximum number of tasks, stack-sizes, etc. Writing
+this piece of software is not easy and when it is done, you still have to
+develop the entire application.
 
-VRTX can be configured with hooks to handle specific processing for tasks management. There is one hook for tasks creation, one
-for tasks commutation and one for tasks deletion. In our implementation we have hooks for the AMD29050 floating point
-co-processor, to backup and restore FPU registers on context switching. For memory protection and segmentation, one can use
-these hooks to handle MMU/MPU contexts for the same tasks operations. In our evaluation, for performances issues, MMU/MPU
-contexts is not used but FPU contexts are used for motor control.
+VRTX can be configured with different hooks to handle specific
+processing related to tasks management. There is one hook for
+task creation, one for tasks commutation and one for task
+deletion. In our implementation we also used hooks to manage the
+AMD29050 floating point co-processor, in order to backup and
+restore the FPU registers on context switching. Other hooks can
+be used to handle the MMU/MPU contexts during the same task
+operations, if memory protection and segmentation is needed. For
+performances issues, in our evaluation we dismissed MMU/MPU
+management but used the FPU for motor control.
 
-The operating system handles dynamic memory allocation and basic input/output functions on a serial line but drivers must
-be given for this in the configuration software. Standard C library functions such as printf/scanf and malloc/free must be
-also implemented by the user.
+The operating system handles dynamic memory allocation and basic
+input/output functions on a serial line if the related driver is
+included in the configuration software. Standard C library
+functions such as printf/scanf and malloc/free must be also
+implemented by the user.
 
-In the AMD29000 version, several processor registers are reserved for operating system use, this is possible because of the big
-amount of registers (192). This is done to improve execution efficiency by reducing context switching number of registers
-to save/restore. Obviously, the number of registers can be a benefit for a task because of C compiler optimizations but it
-implies a big cost for tasks commutations. In the MC68000 version of VRTX, there are no reserved registers for system use as
-there are less of them. After this introduction we are going to review some features of the operating system. Note that a lot
-of the preceding characteristics can be found in other real-time operating systems.
+In the AMD29000 version, several processor registers are reserved
+for the operating system. This feature isn't detrimental because
+the hardware implements a big amount of registers (192) but
+improves execution efficiency because it reduces the number of
+registers to save/restore during context switching. As regards
+the number of registers dedicated to each task, note that
+although a big number of registers helps the C compiler do
+optimizations it implies a significant cost during tasks
+commutations. Since there are much less registers in the MC68000
+processor architecture, no registers are reserved for system use
+in the MC68000 version of VRTX. We are now going to review some
+features of the operating system, been understood that a lot of
+the preceding characteristics can be found in other real-time
+operating systems.
 
-\paragraph{Tasks.} As we said before, VRTX is a multi-task operating system. A VRTX task corresponds to the execution of binary
-instructions by the processor. The operating system handles time sharing between all ready tasks in a given priority. A task can
-create other tasks but there are no ancestor or sibling relations between them. A task cannot have information on what task
-created it. Tasks are created end deleted without any incidence except context switching with respect to priorities. For example,
-there is no implicit meeting between a task and her mother at end of execution.
+\paragraph{Tasks.} As we said before, VRTX is a multi-task operating system. A VRTX
+task corresponds to the execution of binary instructions by the
+processor. The operating system handles time sharing between all
+ready tasks in a given priority. A task can create other tasks
+but there are no ancestor or sibling relations between them. A
+task can get no information upon it's ancestor. Tasks are created
+and deleted without any incidence except context switching with
+respect to priorities. There is no implicit meeting between a task
+and the task which created it at the end of execution, for example.
 
-Each task has a priority defined at its creation. The priorities allows the system to choose which task among the ready ones
-will run on the processor (scheduling). VRTX is using fixed priorities in opposition to time sharing multi-task operating
-systems as UNIX. In such a system, the priority of a given task is varying along the execution. An intensive time consuming
-task priority will be lowered to avoid processor starvation for the other tasks. Then, the priority will be raised to initial
-value when the system consider that the task should get more processor execution time, this is considered as a fair operating
-system. As a lot of fixed priority operating systems, VRTX is an unfair one : a high priority task can get a hundred per cent
-of processor execution time.
+Each task is allotted a priority when created. Priorities enables
+the system to determine which task among the set of ready tasks
+will run at any given time on the processor (scheduling). VRTX is
+using a fixed-priorities scheme, unlike time-sharing multi-tasks
+operating systems such as UNIX. In these systems, the priority of
+any given task varies with time. An intensive time-consuming
+task's priority will be lowered to avoid processor starvation for
+the other tasks. Later its priority will be raised again to its
+initial value when the system considers it should anew be
+allocated processor time. This is called a "fair operating system".
+Like many fixed-priority operating systems, VRTX is an unfair
+one : the highest priority task may get hundred per cent of
+processor time.
 
-There are two scheduling modes in VRTX. In the first, the ready tasks in the highest priority are executed in a round robin
-manner each for a maximum of time called quantum (typically 10 milliseconds). The operating system is getting processor
-control at the end of each quantum via a hardware clock interrupt (timer). This mode make the system fair for a given
-priority level. In the second mode, the quantum is infinite and the running task must relinquish processor explicitly or via
-a system call to allow another task execution.
+There are two scheduling modes in VRTX. In the first mode, all
+the ready tasks of highest priority are executed in a round robin
+manner, each task running for a maximum time called a quantum
+(typically 10 milliseconds). The operating system gets processor
+control at the end of each quantum via a hardware clock interrupt
+(timer). In this mode the system is fair for a given priority
+level. In the second mode, the quantum is infinite so that the
+running task must relinquish the processor (either explicitly or
+via a system call) to allow executing an other task.
 
-We have seen previously that in our VRTX configuration there is only one address space shared by tasks and system. However,
-each task has a private stack that allows it (with a high level programming language or not) to implement function call
-mechanism with parameter passing or local variable dynamic allocation in a function. There is no stack memory protection in
-our configuration.
+We have mentioned previously that in our VRTX configuration there
+is only one address space shared by user tasks and system. An
+other feature to be mentioned is that a private stack is
+allocated to each task so that it is possible to implement a
+function-call mechanism with parameter passing or local dynamic
+allocation of variables in a function. However there is no
+stack-memory protection in our configuration.
 
-Here is a short description of common tasks operations. {\em Create} : crate the task and specifying priority, entry point,
-and execution mode (supervisor or user). {\em Delete} : immediate cancellation of a task, a task can terminate itself.
-{\em Suspend} : the task goes to non ready queue, a task can suspend itself. {\em Resume} : after a suspend, a task can be
-resumed by another one. {\em Priority} : change current task priority. {\em Information} : get the system internal task control
-block address with informations.
+Let's review shortly now basic tasks-related functions. {\em Create} : creates the task, specifying priority, entry point,
+and execution mode (supervisor or user). {\em Delete} : immediate cancellation of a
+task (a task can also terminate itself). {\em Suspend} : the task goes
+to the non-ready queue (a task can also suspend itself). {\em Resume} : once suspended, a task
+can be resumed by another one. {\em Priority} : changes the priority of the current task. {\em Information} : recovers
+the address of the system internal task-control block containing relevant informations.
 
-VRTX is an unfair operating system because it intended to be used for real-time application control. A high priority task
-can monopolize the processor and release it only when it has to do so. More system calls allow a task to lock context switching
-and quantum limited execution windows. Once the operating system is locked, there is only one task executed as with a mono-task
-one. The operating system can be of course unlocked. The operating system also has an idle task that has a low priority and is
-executed when there is no other task to execute. The default idle task can be replaced at configuration time by a user
-provided idle task which can be used to implement a low priority activity.
+VRTX is an unfair operating system because it is designed for
+real-time application control. A high-priority task can
+monopolize the processor, releasing it only when it needs to do
+so. Other system calls allow a task to lock context-switching or
+to define windows of execution with limited quantum. Once the
+operating system is locked, it behaves as a mono-task system with
+only one task running. The operating system can also be unlocked,
+of course. Finally, there is one task of lowest priority in the
+operating system - the idle task - that is executed when no other
+task is ready to run. The default idle task can be replaced at
+configuration time by a user idle task which can be used to
+implement a low priority activity.
 
-\paragraph{Communications between tasks.} VRTX gives for communications between tasks four object types. They are common
-objects that can be found in other operating systems and allow the user to implement classical communication schemes
-(producer/consumer for example) or more complex ones. Communications means are (in case of a blocking system call, the user
-can give a maximum amount of time) listed after. {\em Mailbox} : a mailbox is a 32 bits memory, the user can post a value in
-and this is a non blocking action, there is an error if the mailbox is full. Pending on a mailbox can be a blocking action if
-it is empty. If more than one task is pending, the highest priority or next in same priority level will be served. {\em FIFO} :
-a FIFO is a set of 32 bits values. The user specifies the FIFO size at creation time and as for mailboxes, posting to a FIFO
-cannot be blocking. Pending a FIFO is blocking if it is empty but it is possible to check for it before. The user can ask for
-the current FIFO size and also jam a new element. There is a system call to get a copy of the next element in the FIFO without
-removing it. At FIFO creation, the user can tell the system the way blocked tasks are awaken. Two ways, the highest priority
-task is activated (as for mailboxes) or it is the first task waiting for the FIFO which is activated and so on in blocking
-order. {\em Flags set} : a flag set is made of 32 flags, each bit in a 32 bits word. For the consult action, the user gives
-a mask and a parameter to indicate a "and" or "or" wait condition. If the condition is satisfied, consulting the flag is not
-blocking. Consulting a flag never changes its value, a system call allows this. Task awaking of flags is made according to
-priorities and more than one task can be awaken at a time. {\em Counting semaphores} : a counting semaphore can have a value
-between 0 and 65535. It is a well known concept introduced by Dijkstra to handle mutual exclusion for a shared resource.
-The user can add one to a counting semaphore which is never blocking. He can also decrement it and if the value is zero, the
-calling task is blocked. As for a FIFO, there are two strategies for tasks awaking.
+\paragraph{Communications between tasks.} VRTX provides four types of objects to deal with communications
+between tasks. These standard objects that can be found in other
+operating systems allow the user to implement simple
+(producer/consumer for example) or complex communication schemes.
+Communication tools are listed below (note that it possible to
+specify a time-out for blocking system-calls). {\em Mailbox} : a
+mailbox is a 32-bits memory where the user can post a value (non
+blocking action), an error is raised if the mailbox is full.
+Symmetrically, to pend on a mailbox is a blocking action if the
+mailbox is empty. If more than one task is pending, the
+highest-priority task or next task in the same priority level
+will be served. {\em FIFO} :
+a FIFO is a set of 32-bits values. The
+user specifies the FIFO size when he creates the FIFO, and
+similarly to a mailbox, posting to a FIFO is not blocking while
+pending on a FIFO is blocking if it is empty (but it is possible
+to check the case before pending). A user can ask for the current
+FIFO size and jam a new element into it. There is a system call
+to get a copy of the next element in the FIFO without removing
+it. Two policies for reactivating a task pending on a FIFO are
+available : either the systems activates the task of highest
+priority (as for mailboxes) or it activates all the tasks waiting
+for that FIFO in sequential order of arrival. At FIFO creation,
+the user can specify the policy to be applied. {\em Flags set} : a
+flag set is made of 32 flags, each one bit in a 32-bits word. In
+order to check the flag, the user gives a mask and a parameter
+indicating if he requires an "and" or "or" wait condition. If the
+condition is satisfied, checking the flag is not blocking.
+Checking a flag never changes its value, there is a system call
+to do that. More than one task can be wakened on flag condition
+at the same time, task-execution being done according to
+priorities. {\em Counting semaphores} : a counting semaphore can have
+a value between 0 and 65535. It is a well-known concept
+introduced by Dijkstra to handle mutual exclusion while accessing
+to a shared resource. The user can increment a counting semaphore
+(non blocking action). He can also decrement it : if the value is
+zero, the calling task is blocked. Task-wakening options are the
+same as for FIFOs.
 
-There is also another way to share data between tasks : shared memory as we said that there is only one address space. The
-combined use of semaphores and shared memory allows the user to implement as complex communications schemes as possible.
+Lastly, VRTX provides a mechanism called "shared memory"
+data between tasks. This is possible because, as was said before,
+there is only one address space in the system. Combined use of
+semaphores and shared memory allows the user to implement
+communications schemes as complex as necessary.
 
-\paragraph{Interrupts.} Just several key point concerning interrupts in general. The processor interrupt concept by peripherals
-is a mechanism on which an operating system design is based. System call are usually implemented with software interrupts that
-are similar to hardware generated ones but raised by a specific processor instruction. When an interrupt occurs, the processor
-execution flow is restarted at an address called an interrupt service routine. The execution mode is automatically set to
-privileged and further interrupts are not allowed. Several registers are also saved either on a stack or in additional special
-registers that can be in turn saved in memory.
+\paragraph{Interrupts.} Some key point concerning interrupts in general. The concept of
+processor interruption by peripherals is a basic mechanism for
+operating system design. System calls are usually implemented
+through software interrupts that are similar to
+hardware-generated ones, but are raised by a specific processor
+instruction. When an interrupt occurs, the processor execution
+flow is restarted at an address called an interrupt-service
+routine address. Execution mode is automatically set to
+privileged and further interrupts are disabled. Several registers
+are saved either on a stack or into additional special registers
+that can be afterwards saved in memory if necessary.
 
-This mode of operation allows the operating system to manage all resources with coherency : save/restore tasks contexts, handle
-communications, etc. Without being interrupted in critical phases. The operating system also drives peripherals using interrupts,
-for example a peripheral telling the processor that data is available by using an interrupt. In real-time programming, interrupts
-are very often used to trigger a process for example a data acquisition one. Interrupts can also occur at a specific rate for time
-triggered actions.
+This mode of operation allows the operating system to manage all
+resources coherently : save/restore task-contexts, handle
+communications, etc. all this can be done without interruption
+during critical phases. The operating system also controls
+peripherals via interrupts, such as for instance a peripheral
+telling the processor that data is available by raising an
+interrupt. In real-time programming interrupts are very often
+used to trigger a process, for example a data-acquisition one.
+Interrupts can also occur at specific rates for clock-triggered
+actions.
 
-One can consider two operating systems behaviors regarding interrupts. Some are not interruptible while the operating system is
-in privileged mode and then system call are atomic. They execute without being interrupted and if an interrupt occurs, the
-corresponding handler execution is delayed. These operating systems are said to be non preemptive ones in privileged mode. This
-behavior has an impact on operating system latency and is not suitable for real-time applications. VRTX is preemptive in
-privileged mode so operating system implementation is more difficult but interrupt latency is better. In VRTX implementation
-interrupts are allowed as much as possible so handlers delay is minimized.
+As regards interrupts, two different operating-systems behaviors
+are possible. Interrupts may themselves be executed atomically while
+the operating system is running in privileged mode and system
+calls are then atomic. They execute without being interrupted ;
+if an interrupt occurs, the corresponding handler execution is
+delayed. These operating systems are said to be non-preemptive in
+privileged mode. This behavior has a detrimental impact on
+operating system latency, and is not suitable for real-time
+applications. VRTX is preemptive in privileged mode, so operating
+system implementation is more difficult but interrupt latency is
+better. VRTX allows interrupts as much as possible, so delays due
+to handlers are minimized.
 
-In VRTX, the user can use a special stack to backup registers at interrupt routine prologue. Such a routine can be activated by
-hardware without indirection via a interrupt driver as it is the case in many real-time operating systems. This is reducing
-interrupt latency. An interrupt routine can communicate with task level, for example, post a value in a mailbox to trigger
-a task level process according to fixed priorities. However, this mechanism can be used only with conformance to a protocol
-with the operating system : it is necessary to signal interrupt routine entry and exit if system calls should be used in it.
-At the end of interrupt routine, control must be given back to operating system in supervisor mode and then scheduling can
-occur that will produce one or more context switches. This protocol is a little time consuming but really less than in other
-operating systems with interrupt drivers. For a specific application, this protocol can be avoided to get better interrupt
-latency.
+In VRTX, a special stack to backup registers during
+interrupt-routine prologue is available. Such a routine can be
+activated by hardware without indirection by the interrupt
+driver, as it is the case in many real-time operating systems.
+This reduces interrupt latency. An interrupt-routine can
+communicate with the task level according to fixed priorities,
+for example by posting a value in a mailbox to trigger the
+task-level process. However, such a mechanism must comply to a
+system protocol : ie, when any any system-call is used inside an
+interrupt-routine, the interrupt-routine entry and exit must be
+signaled to the system. At the end of interrupt routine, control
+is given back to the operating system in supervisor mode so that
+rescheduling can take place. This protocol is time-consuming but
+actually less than the protocol implying interrupt drivers in
+many other operating systems. Note also that for some specific
+applications, it is possible to do without this protocol in order
+to get better interrupt latency.
 
-We are now going to describe another operating system suitable for real-time applications.
+We are now going to describe an other operating system dedicated
+to real-time applications.
 
 \subsection{LynxOS and POSIX real-time extensions}
 
-Before describing the Lynx operating system as we did for VRTX, we are going to point out several informations about POSIX
-standard ("Portable Operating System Interface" X for similarities with UNIX). Information listed here is given essentially
-by~\cite{LYNX}, \cite{JMR:93} and \cite{JMR:94}.
+Before describing the Lynx operating system, we are going to give
+some general information about the POSIX standard ("Portable
+Operating System Interface", X standing for similarities with
+UNIX). Information listed here is essentially taken from~\cite{LYNX}, \cite{JMR:93} and \cite{JMR:94}.
 
-POSIX reference number is 1003 in IEEE directory ("Institute of Electrical and Electronics Engineers") which intend to establish
-industrial standards. POSIX is also referenced as an international standard of ISO 9945 ("International Standards Organization").
-This standard is based on application programming interfaces descriptions of the operating system implementing it. These
-interfaces specifies data types, types names, function names and semantic. We consider POSIX used with the C programming language
-which is also standardized. Application developed with POSIX conformance can be considered as operating system independent.
-Most UNIX implementations implements POSIX interface but this is also the case for VxWorks and LynxOS for example. There are
-several subsections in POSIX, the basic features are in 1003.1 and real-time extensions are in 1003.4 and 1003.4a for real-time
-threads extensions.
+POSIX reference number is 1003 in the IEEE directory ("Institute
+of Electrical and Electronics Engineers") which intends to
+establish industrial standards. POSIX is also referenced as the
+international standard ISO 9945 ("International Standards
+Organization"). An ISO standard contains the description of all
+application programming interfaces for the operating systems that
+implement it. These interfaces specify data types, types names,
+functions names and semantic. As POSIX-compliant applications can
+be considered operating-system independent, and as C is also a
+standardized system-independent programming language, we'll
+assume POSIX and C to be our reference framework. Most UNIX
+implementations implement the POSIX interface, and this is also
+true for VxWorks and LynxOS. There are several subsections in
+POSIX, the basic features are in 1003.1, real-time extensions are
+in 1003.4 and real-time threads extensions in 1003.4a.
 
-The LynxOS operating system aim to be POSIX and ANSI-C conforming which is a interesting approach. For ANSI-C it is based on
-GNU compilers and libraries. For operating system interface LynxOS includes all POSIX even real-time extensions. On another
-hand, LynxOS is also compatible with the two main UNIX flavors : "System V" and BSD. LynxOS is a multi-task and multi-user
-operating system with the same execution levels than in VRTX but a user notion similar to UNIX is also implemented. LynxOS
-is supported for several targets such as IBM PC, Motorola VME boards based on MC68000 or PowerPC, SUN spark based workstations,
-several HP embedded platforms, IBM PowerPC based computers for example. The operating system is delivered in binary plus
-a collection of object files to allow the user to customize it. The complete development environment is located on the
-target system directly.
+The LynxOS operating system is aimed to be POSIX and ANSI-C
+conforming, which is a interesting approach. The ANSI-C part is
+based on GNU compilers and libraries. As regards the operating
+system interface, LynxOS includes all POSIX (including real-time
+extensions). Besides, LynxOS is compatible with the two main UNIX
+flavors : "System V" and BSD. LynxOS is a multi-tasks and
+multi-users operating system, with execution levels similar to
+VRTX but implementing in addition a notion of user similar to
+UNIX. LynxOS is available for several targets such as IBM PC,
+Motorola VME boards based on MC68000 or PowerPC, SUN Spark
+workstations, several HP embedded platforms, IBM PowerPC based
+computers, etc. The operating system is delivered in binary code
+plus a collection of object files allowing the user to customize
+it. The complete development environment is located directly on
+the target system.
 
-The kernel size can go from 200Kb up to more than 1Mb with all possible extensions. It can be stored in ROM with a minimal
-ROM file system and it can be booted via a network. These two possibilities allow application deployment on minimal hardware
-configurations and multiple targets to share easily the same software configuration.
+The kernel size may range from 200Kb to more than 1000Kb with all
+possible extensions. It can be stored in ROM with a minimal ROM
+file system, and it can also be booted via a network. These two
+possibilities allow easy deployment of applications on minimal
+hardware configurations, as well as easy implementations of the
+same software on multiple hardware targets.
 
-Even if LynxOS integrates a lot of UNIX inspired standards, the kernel is really different mainly because it is designed
-to target real-time applications. The kernel design is very close to VRTX one but the development environment is on target.
-Our evaluation system is based on a MC68040 VME board with LynxOS installed on a local hard disk that allow real-time
-application implementation.
+Although LynxOS integrates a lot of UNIX inspired standards, its
+kernel is really different because it is designed for real-time
+applications. Its kernel design is very similar to VRTX, with the
+difference that its development environment is located on the
+target. Our evaluation system is based on a MC68040 VME board
+with LynxOS installed on a local hard disk.
 
-Memory management is paginated and can also be virtual. Each process has its own address space which is private. The kernel has
-also its own address space but kernel pages are always resident in core memory. If virtual memory management is not enabled,
-all process pages are also resident in core memory. If it is enabled, a swap area can be defined on a hard disk to store
-pages that cannot be in core memory temporally. Such a memory segmentation brings a safety feature as processes and kernel
-cannot access each other address spaces.
+Memory management is paginated and can also be virtual. Each
+process has its own address space which is private. Like any user
+process, the kernel has its own address space but kernel pages
+are always resident in core memory. When virtual memory
+management is not enabled, all process pages are also resident in
+core memory. In order to have virtual memory enabled, a swap area
+must be defined on hard disk to store the pages that temporally
+cannot stay in core memory. As users processes and kernel cannot
+access each other address spaces, such a memory segmentation is a
+feature of safety.
 
-\paragraph{Processes and activities.} The basic execution entity of LynxOS has the same name than UNIX one : process. But here
-a process has a fixed priority as opposed to time dependent priority under UNIX. Scheduling is made with different priority
-queues and a round robin quantum for a given priority as in VRTX. The quantum can differ from one priority level to another
-so LynxOS is fair for time scheduling only for tasks with the same priority (this is close to real-time processes handling
-in "System V.4" version of UNIX).
 
-If virtual memory in engaged, processes pages can swapped, LynxOS swapping is handled by a system process who has a priority
-as all processes. This means that processes priorities have an influence on memory management. A process with a higher priority
-than the memory management process will never be swapped. Processes with a lower priority can be swapped. In addition to this
-mechanism, it is possible for a process to lock pages in core memory without influence of priority. This must be used with
-caution because it can lead to a memory starvation. A LynxOS process can be considered as a resource encapsulation unit such
-as file descriptors, memory space, etc. A program execution is implemented as a "thread". A LynxOS process is made of one or
-more threads that are running in the process address space.
+\paragraph{Processes and activities.} The basic execution entity of LynxOS and UNIX are the same : the process. However, when
+the process of UNIX has a time-dependent priority, the process of LynxOS has a fixed priority. Its scheduling of processes is
+based on queues of different priorities, with a round-robin allocation of quantums inside a given priority queue as in VRTX.
+The quantum can differ from one priority level to the other, so as regards scheduling LynxOS is fair only for tasks with the same
+priority (this is close to real-time processes handling in "System V.4" version of UNIX).
 
-As for VRTX tasks, each thread owns a private stack for function calls and automatic variables and also a priority given at
-creation. A process always has an initial thread, which is particular to LynxOS and not specified in POSIX recommendations.
-A LynxOS process with its initial thread is equivalent of a process in the original UNIX way. As for VRTX, a thread can
-monopolize the processor resource and scheduling is not necessary fair as usual in real-time operating systems. LynxOS
-threads implementation conforms to POSIX, for more informations about POSIX threads see~\cite{JMR:94}.
+When virtual memory is used, LynxOS swapping mechanism is handled by a system process which has itself a priority
+as any other process. This means that the relative priorities of processes have an influence on memory management. A process with
+priority higher than the memory-management process will never be swapped when a process with a lower priority can be swapped.
+In addition, a process can lock pages in core memory without modifying its priority. This feature must be used with
+caution because it may lead to memory starvation. A LynxOS process can be seen as a unit of resources encapsulation, such
+as file descriptors, memory space, etc. The execution of a program is implemented as a "thread". Any LynxOS process consists of
+one or more threads that are running in the process address space.
 
-We are now going to list the main operations available for threads control on POSIX. {\em Create} : thread creation. The operating
-system assign a unique thread identifier that can be used for further operations. Some parameters can set priority, stack size,
+As for VRTX tasks, each thread owns a private stack for function calls and automatic variables allocation. It is given a fixed
+priority when created. A LynxOS process always has an initial thread, a specific feature not specified in POSIX recommendations.
+The ensemble of a LynxOS process with its initial thread is equivalent to a UNIX original process. As any thread can
+monopolize the processor, LynxOS scheduling is not necessarily fair. LynxOS threads implementation conforms to POSIX, for more
+informations about POSIX threads see~\cite{JMR:94}.
+
+We are now going to list the main operations available for threads control under POSIX. {\em Create} : thread creation.
+The operating system assigns a unique thread identifier that is usable for further operations. Some parameters set priority, stack size,
 scheduling type (FIFO, ROUND ROBIN, DEFAULT), etc. There are defaults values for these attributes. {\em Self termination} :
-thread termination by itself with an exit code that can be an address in the stack. This data area is accessible by other
-threads so stack memory is not released after termination. {\em Termination by another thread} : a special exit code is given.
-{\em Detach } : release all resources of a terminated thread. Several scheduling algorithms are possible and the default one
-is based on fixed priorities with a quantum for a given level. Each priority level can have its own quantum. FIFO and ROUND ROBIN
-scheduling are the same but with one global infinite quantum for the first and a fixed quantum for each priority level for the
-second.
+a thread triggers its own termination, returning an exit code that can be an address in the stack. As stack memory is not released after
+termination, this data area remains accessible by other threads. {\em Termination by another thread} : a special exit code is returned.
+{\em Detach } : releases all the resources of a terminated thread. Several scheduling algorithms are possible : DEFAULT scheduling
+combines a fixed priority and a specific quantum for each priority level, ROUND ROBIN and FIFO scheduling are similar except that there
+is only one global quantum for all priority levels, finite in the first case and infinite in the second.
 
-\paragraph{Communications.} There are two communication tools types, one suitable for inter-process and the other one for threads.
-For inter-process communication the tools are implementations of UNIX "System V" and BSD flavors. LynxOS includes IPCs ("Inter
-Process Communications") and also STREAMS from "System V" and UNIX domain sockets from BSD. POSIX standard changed recommendations
-in 1003.4 Draft 9 concerning "System V" IPCs. The use of communications tools (semaphores, shared memory, messages queues) is made
-easier. For threads running in a process, there are more simpler tools designed for efficiency the user can combine to
-implement complex communication schemes.
+\paragraph{Communications.} LynxOS implements two sets of communication tools, one for inter-process communications and the other for
+threads. Inter-process communication tools are implemented as a mix of UNIX "System V" and BSD flavors, LynxOS including IPCs ("Inter
+Process Communications") and STREAMS from "System V", and UNIX domain sockets from BSD. POSIX standard changed recommendations
+in 1003.4 Draft 9 concerning "System V" IPCs. The use of communications tools (semaphores, shared memory, message queues) is made
+easier. For threads running in a process, additional simple tools have been designed so that the user can implement more efficiently
+complex communication schemes.
 
-Additionally to shared memory in the process address space, LynxOS implements POSIX tools. {\em Rendezvous} : a thread can wait
-for another thread termination via a rendezvous. When it occurs, the waiting thread get the exit code of the other thread.
-{\em Mutexes} : it is similar to a binary semaphore but only the owning thread can release the mutex. A thread is blocked when
-it tries to get a mutex taken by another thread. This is used for mutual exclusion toward a shared resource that must be
-accessed in a critical section. {\em Condition variables} : combined to mutexes, it allows complex synchronizations between
-threads. After awning a mutex, a thread can wait on a condition variable. During this, the mutex is released while the condition
-is false. When a thread signals the condition variable, the mutex is automatically taken and the waiting thread is awaken. It
-is possible to wakeup one thread among a set of thread waiting on the same condition with the same mutex. It is also possible
-to wakeup all the waiting threads at the same time. A thread can use processes communication tools and LynxOS includes tools that
-are not required by POSIX such as fast binary and counting semaphores and shared memory.
+Besides shared memory inside a process address space, LynxOS implements POSIX tools. {\em Rendezvous} : a thread can wait
+for the termination of an other thread via a rendezvous. When the termination occurs, the waiting thread gets the exit code of the
+terminated thread. {\em Mutexes} : a mutex is similar to a binary semaphore but only the thread owning the mutex can release it.
+A thread is blocked when it tries to get a mutex that has been taken by another thread. This is used when mutual exclusion between threads
+is needed, for instance when shared resources must be accessed in a critical section. {\em Condition variables} : combined to mutexes,
+it allows complex synchronizations between threads. Once it owns a mutex, a thread can wait on a condition variable. The mutex is released
+while the condition is false. When a thread signals the condition variable, the mutex is automatically taken and the waiting thread is
+awakened. It is possible to wakeup selectively one thread among a set of threads waiting on the same condition with the same mutex, as well
+as all the waiting threads at the same time. A thread can also use inter-process communication tools, and LynxOS includes tools that
+are not required by POSIX such as fast binary and counting-semaphores or shared memory.
 
-Software signals similar to UNIX ones are also available in LynxOS and can be sent to process or threads. A signal sent to a
-process is taken randomly by one of its threads which accept that signal. If none of them accept it, it is pending waiting
-for a thread to accept it. A signal can be sent to a particular thread in a process.
+Software signals similar to the UNIX ones can be sent to processes or threads. A signal sent to a process is randomly taken by one of the
+process's threads which accept that signal. If none of them accepts the signal, it stays pending for a thread to accept it. A signal can also
+be sent to a particular thread of a process.
 
-\paragraph{Interrupts.} LynxOS does not allow an application to catch a hardware interrupt itself. According to LynxOS designers
-this direct mode leads the user to implement services that should be handled by the operating system. In VRTX, we have seen
-that this direct mode is better for interrupt latency but with the cost of more code to implement. The only way to handle
-interrupts with LynxOS is to use system drivers. Only drivers can attach a hardware interrupt to a handler functions. Usually,
-interrupt routines are as short as possible and they trigger more time consuming handlers in system threads. These threads are
-executed in kernel space and as they are scheduled, the user can manage priorities for interrupts.
+\paragraph{Interrupts.} LynxOS does not allow an application to catch a hardware interrupt by itself. To LynxOS designers
+this direct mode would have lead to the implementation by users of services that should be handled by the operating system. We have seen
+in VRTX that this direct mode is better as regards interrupt latency but implies writing more code to be implemented. With LynxOS, the only
+way to handle interrupts is to use system drivers. Only drivers can attach a hardware interrupt to a handler functions. Usually,
+interrupt routines are as short as possible, their main duty being to trigger one or more system threads to handle more time-consuming tasks.
+These threads are executed in kernel space. As they are themselves scheduled, the user can manage interrupts priorities.
 
-A particular counting semaphore type is used by an interrupt handler to communicate with system threads level. There is one
+A particular counting-semaphore type is used by an interrupt handler to communicate with the system-threads. There is only one
 kernel handler that catches all hardware interrupts, prepare the execution context and then executes a driver handler if installed.
 This allows easy system coherency but introduces interrupt latency.
 
 \subsection{The ADA programming language}
 
-All informations listed here come from~\cite{Booch:86} and~\cite{ADA:83}. The ADA programming language is a high level language
-that integrates a lot of features. One of the target application field is real-time development and we will describe here ADA
-as a programming language that allows to specify applications with asynchronous communicating tasks. There are two standards
+All the information listed here comes from~\cite{Booch:86} and~\cite{ADA:83}. The ADA programming language is a high-level language
+which integrates a lot of features. One of its field of application is real-time development and we will describe here ADA
+as a programming language which allows to specify applications with tasks communicating asynchronously. There are two standards
 describing ADA : ANSI and ISO.
 
-\paragraph{Tasks.} It is possible to declare tasks in an ADA program. Execution of them is either controlled by a kernel linked
-with the application executable or by a host operating system not included in the ADA compiler. In the first implementation,
-the ADA compiler builds an executable by sources file compilation and link with a micro-kernel. In the second one, the compiler
-generate code for task creation in the host operating system.
+\paragraph{Tasks.} It is possible to declare tasks in an ADA program. Execution of the tasks is either controlled by a kernel which is 
+linked with the executable code of the application or by an operating system not included in the ADA compiler but running on the host. 
+In the first implementation, the ADA compiler builds an executable by compiling the source files and linking the objects with a micro-kernel. 
+In the second case, the compiler generates the extra code needed by the host operating system to create the tasks.
 
-The user can use the "PRIORITY" pragma to set priorities to ADA tasks. These priorities can have different significations
-depending on the host operating system. The scheduling algorithm is not specified in ADA standard and neither the way to schedule
-two tasks at same priority level. An ADA program is made of tasks similar to UNIX processes, LynxOS threads or VRTX tasks, this
-is why we consider ADA as an operating system coupled to a high level programming language.
+The user can use the "PRIORITY" pragma to set priorities to ADA tasks. These priorities have different significations
+depending on the host operating system. Neither is the scheduling algorithm is specified in the ADA standard nor the way to schedule
+two tasks of same priority. An ADA program is made of tasks similar to UNIX processes, LynxOS threads or VRTX tasks. This
+is why we consider ADA as an operating system coupled to a high-level programming language.
 
-\paragraph{Communications in ADA.} The language includes mainly one communication tool : the binary rendezvous with data passing.
+\paragraph{Communications in ADA.} The language includes essentially one communication tool : the binary rendezvous with data passing.
 An ADA task can accept a rendezvous with another task via the "accept" operator. The rendezvous is realized when at least two
-tasks are waiting on the "accept" operator, if there are more than two tasks, priorities may influence the two tasks selection.
-A rendezvous is always blocking when only one task is trying to accept it. It is optionally possible to transfer data when a
-rendezvous is realized, similarly to a parameter passing for a function call.
+tasks are waiting on the "accept" operator. If there are more than two tasks, priorities may influence how the two tasks will be selected.
+A rendezvous is blocking as long as only one task is trying to accept it. It is optionally possible to transfer data when a
+rendezvous is realized, similarly to parameter passing for a function call.
 
-It is possible with the "select" operator to wait for more than one rendezvous according to the state of local variables in a task.
-Only one rendezvous will be realized and if none is possible, the user can specify a default action to be taken. If more than
+With the "select" operator it is possible to wait for more than one rendezvous, according to the state of local variables of a task.
+Only one of the possible rendezvous will be realized ; if none is possible, the user can specify a default action to take place. If more than
 one rendezvous is possible, tasks are selected to realize the rendezvous according to priorities, the highest priority will be
-used. If all the tasks are in the same priority level, it is the scheduling implementation of the underlying operating system
-that will decide. It is also possible to declare shared memory segments in ADA that can be combined with rendezvous to
-implement complex communication schemes. But usually, rendezvous with data exchange is enough.
+used. If all the tasks have the same priority, it is the scheduling implementation of the underlying operating system
+that will decide. It is also possible to declare shared-memory segments in ADA which can be combined with rendezvous to
+implement complex communication-schemes. Usually, rendezvous with data exchange suffice.
 
-\paragraph{Interrupts.} It is possible to associate a hardware interrupt to an ADA rendezvous. Only one task then is allowed
-to wait for this rendezvous to occur. When the interrupt is taken, the corresponding rendezvous is realized and the waiting
-task is awaken. The task can get some read-only data when the rendezvous occur. An interrupt can be seen as the highest
-priority task always greater than real tasks. In this way, the rendezvous associated to an interrupt is at highest priority.
-The scheduling algorithm of the underlying operating system is not involved in interrupts rendezvous. Interrupt handling
-implementation for the host operating system is not specified in the language standard. It can use a direct handler without
-an interrupt driver or another implementation.
+\paragraph{Interrupts.} It is possible to associate a hardware interrupt to an ADA rendezvous. In that case only one task is allowed
+to wait for this rendezvous. When the interrupt is taken, the corresponding rendezvous is realized and the waiting
+task is awakened. The task can get read-only data when the rendezvous occurs. An interrupt can be seen as the highest-priority 
+task, with a priority always greater than any real tasks. This way, the rendezvous associated to an interrupt is at highest priority.
+The scheduling algorithm of the underlying operating system is not involved in interrupts rendezvous. Interrupt-handling
+implementation for the host operating system is not specified in the language standard. It can be done either by a direct handler without
+an interrupt driver or by any other implementation.
+-------------------------------
 
 \subsection{VxWorks}
 
