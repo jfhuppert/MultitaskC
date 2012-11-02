@@ -1,0 +1,5 @@
+Raw_ethernet stuff for MultitaskC based on etherboot package.
+This is a work in progress and for the moment it is tested with VirtualBox.
+Go to src and type "make bin/e1000.iso" so you will get a bootable image "e1000.iso".
+Configure a simple VM with an e1000 adapter.
+When you boot, you sould see broadcast packets with a "tcpdump" like program.
