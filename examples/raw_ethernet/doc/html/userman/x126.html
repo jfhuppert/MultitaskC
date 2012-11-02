@@ -1,0 +1,520 @@
+<HTML
+><HEAD
+><TITLE
+>Setting up a diskless boot</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+TITLE="Unpacking, compiling and testing the package"
+HREF="x91.html"><LINK
+REL="NEXT"
+TITLE="Testing the network booting"
+HREF="x186.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x91.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x186.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN126"
+></A
+>Setting up a diskless boot</H1
+><P
+>&#13;In this section I assume you want to boot a Linux kernel. Booting a
+FreeBSD kernel is documented elsewhere and does not require a generating
+a boot image.  Booting a DOS kernel is similar, the main differences
+being in the way you set up the boot image.
+
+</P
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN129"
+></A
+>Making a boot image</H2
+><P
+>&#13;Etherboot expects to download a boot image in either ELF or <A
+HREF="../devman/t1.html"
+TARGET="_top"
+>tagged</A
+> format containing the code to be
+executed. Briefly explained, a boot image has a wrapper around the
+pieces of code or data that need to be put in various places in the
+computer's memory. It contains a directory telling how large the pieces
+are and where they go in memory. It also says where to start execution.
+
+</P
+><P
+>&#13;A boot image is created using a utility program. The <A
+HREF="../mknbi.html"
+TARGET="_top"
+>utility program</A
+> is specific to the kernel
+you want to load. The version for Linux is called mkelf-linux or
+mknbi-linux and that for DOS is mknbi-dos. These utilities are
+distributed separately and can be obtained from <A
+HREF="http://sourceforge.net/projects/etherboot/"
+TARGET="_top"
+>Etherboot web
+site</A
+>.
+
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN136"
+></A
+>Compiling a custom kernel</H2
+><P
+>&#13;The preferred method of running applications on the booted machine is to
+package an initial ramdisk (initrd) along with the kernel.  This initrd
+can either provide all the files necessary for running the application
+(at a cost of using RAM to hold the files) or mount NFS filesystems to
+obtain other files. Therefore you will need to compile ramdisk options
+in your kernel. For an example of how an initrd is created and packaged,
+see the LTSP project sources.
+
+</P
+><P
+>&#13;After you have compiled the kernel, make the boot image, like this:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;	mkelf-linux --output=/tftpdir/xterm.nb zImage initrd.gz
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+This puts the image in where the tftp daemon expects to find it, in this
+example /tftpdir. Make sure it is world-readable because typically the
+tftp daemon runs as an unprivileged user. It is recommended that you set
+a path explicitly for tftpd instead of relying on any defaults. For
+example, for inetd, the entry in /etc/inetd.conf looks like this (xinetd
+uses a different syntax, check the documentation):
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;tftp	dgram	udp	wait	root	/usr/sbin/tcpd	in.tftpd /tftpdir
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN142"
+></A
+>Setting up a DHCP daemon</H2
+><P
+>&#13;You need to set up a DHCP server to hand out an IP address and other
+configuration information to the client.
+
+</P
+><P
+>&#13;The main requirement of the DHCP server is that it needs to send out
+suitable configuration information. Prior to version 5.0.7, Etherboot
+accepted any DHCP offer (but see REQUIRE_VCI_ETHERBOOT below for an
+exception). Since version 5.0.7 Etherboot will not accept any DHCP offer
+where the server IP is empty (all zero) or the filename is empty. These
+offers are useless to Etherboot anyway so ignoring these offers will
+give it a better chance of picking the right DHCP server.
+
+</P
+><P
+>&#13;If you already have a DHCP server on your network for providing Windows
+clients with IP addresses, chances are that it is not a suitable DHCP
+server because it's only tailored to the single purpose of handing out
+client addresses. Suitable DHCP servers include the ISC DHCPD, available
+for most Unix/Linux systems. You can run such a DHCP server in parallel
+with the Windows one, provided you do not attempt to give Windows
+clients leases, in which case there would be a clash. You can exclude
+Windows clients in two ways. One is to register the only the MAC
+addresses of the diskless clients in /etc/dhcpd.conf, and to make sure
+that the server is declared "not authoritative". The second is to look
+for the Vendor Class Identifier of "Etherboot-5.x" in the DHCP discover
+packet.
+
+</P
+><P
+>&#13;If you already have a DHCP server on your network that does provide the
+server IP and the filename, then you have to either use that DHCP server
+by editing its configuration file. This may require the cooperation of
+the system admin if you are not the admin. If you are not able to
+configure the DHCP server, then proceed to the section on
+REQUIRE_VCI_ETHERBOOT.
+
+</P
+><P
+>&#13;The minimum information you need to put in /etc/dhcpd.conf is:
+
+</P
+><P
+>&#13;
+<P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;The domain name of the machine.
+
+</P
+></LI
+><LI
+><P
+>&#13;The Ethernet (MAC) address of the network card, which you generally
+obtain from a sticker on the card, a configuration program for the card,
+or in the last resort, from watching the output of Etherboot or from the
+packets sent from the card when trying to boot, using the debug option
+of DHCPD.
+
+</P
+></LI
+><LI
+><P
+>&#13;The name of the boot image file, relative to the tftpdir
+directory.
+
+</P
+></LI
+><LI
+><P
+>&#13;The IP address you intend to give it, or the dynamic range it is to come
+from.
+
+</P
+></LI
+><LI
+><P
+>&#13;The TFTP server defaults to the DHCP server if not specified with
+next-server.
+
+</P
+></LI
+></OL
+>
+
+</P
+><P
+>&#13;Here is a sample DHCP configuration for ISC dhcpd:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;option domain-name "ken.net.au";
+option domain-name-servers 192.168.0.1;
+option broadcast-address 192.168.0.255;
+use-host-decl-names on;
+subnet 192.168.0.0 netmask 255.255.255.0 {
+	host xterm {
+		hardware ethernet 08:00:2B:B7:F3:80;
+		fixed-address xterm.ken.net.au;
+		filename "/tftpdir/xterm.nb";
+	}
+}
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+The declaration "use-host-decl-names on" tells dhcpd to include the name
+xterm in the reply so that it can be used as part of pathname to mount
+by NFS, etc.
+
+</P
+><P
+>&#13;If your tftp server is not the same as the DHCP server, use the
+next-server declaration to specify a tftp server.
+
+</P
+><P
+>&#13;The 2.4.4 and above kernels can do a separate DHCP request to obtain an
+address.  Kernels in the 2.2 series use BOOTP.  However user space DHCP
+configuration is now preferred.
+
+</P
+><P
+>&#13;More information about DHCP can be found at the <A
+HREF="http://www.dhcp-handbook.com/dhcp_faq.html"
+TARGET="_top"
+>DHCP FAQ</A
+>.
+
+</P
+><P
+>&#13;If you are on a local network that is not directly connected to the
+Internet, you can use the "private" IP addresses 192.168.x.y (or in the
+other ranges mentioned in <A
+HREF="http://www.ietf.org/rfc/rfc1918.txt"
+TARGET="_top"
+>RFC1918</A
+>). Otherwise
+please ask either your network administrator or your Internet service
+provider for your own IP address(es).
+
+</P
+><P
+>&#13;You could use a bootp daemon instead of a DHCP daemon. However DHCP is
+preferred as DHCP provides more information to control the boot process.
+Also there is a bug in some old versions of bootpd where unnecessarily
+large reply packets are sent, causing packet fragmentation at the UDP
+level, and dropping of the packets by Etherboot.  DHCPD can emulate
+bootpd if that's what you really want.
+
+</P
+><DIV
+CLASS="sect3"
+><H3
+CLASS="sect3"
+><A
+NAME="AEN170"
+></A
+>REQUIRE_VCI_ETHERBOOT</H3
+><P
+>&#13;You may need to Etherboot in an environment where you have to install
+your own DHCP server, and it may interfere with the existing DHCP
+server. Etherboot has a feature designed to overcome this problem. It
+consists of two parts:
+
+</P
+><P
+>&#13;The first part is Etherboot contains code that when it sends out a
+DHCPDISCOVER request, a tag containing a Vendor Class Identifier of
+"Etherboot-x.y" is sent out, where x.y is the version number, currently
+5.2. The 5 and the 2 are printable digits, not binary values, i.e. byte
+values 53 and 50 respectively. This allows the server to identify
+Etherboot clients and ignore all others.
+
+</P
+><P
+>&#13;The second part is Etherboot can be conditionally compiled to require a
+Vendor Encapsulated Option containing a VCI of "Etherboot", otherwise it
+will ignore the DHCPOFFER. The option is not compiled in by default
+because it would cause Etherboot to not boot in plain setups.  The
+server we want to respond will include this tag in DHCPOFFERs and while
+other servers (e.g. Windows servers) may respond, they will be ignored.
+
+</P
+><P
+>&#13;Vendor Encapsulated Option is supported in ISC DHCPD 2 or 3.  (It's not
+documented in DHCPD 2, but it works.) Other DHCP servers may support
+VEO. (It's a RFC2132 option.) In ISC DHCPD 3, follow the documentation
+for declaring a VEO scope. In ISC DHCPD 2 the magic line required is:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;option vendor-encapsulated-options 3c:09:45:74:68:65:72:62:6f:6f:74:ff;
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+Put this in the appropriate scope.  Translation: Vendor Encapsulation
+Options (Option 43) encloses: Vendor Class Identifier (Option 60 =
+0x3c), length 9, value "Etherboot"; End of Options (Option 255 = 0xff).
+
+</P
+><P
+>&#13;If you have a DHCP server already running for the subnet, you probably
+should specify that your additional ISC DHCPD server is not
+authoritative for the the subnet, or it will veto (NAK) existing client
+IP address allocations, upsetting the status quo. See the ISC DHCPD
+options documentation.
+
+</P
+><P
+>&#13;Here is <A
+HREF=" http://www.geocrawler.com/archives/3/5299/2001/7/100/6129709/"
+TARGET="_top"
+>a
+practical document</A
+> describing how it is done.
+
+</P
+></DIV
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN180"
+></A
+>Setting up a tftp daemon</H2
+><P
+>&#13;Now set up a tftp daemon. This means installing the tftp package and
+making sure that the tftp service is active in
+<TT
+CLASS="filename"
+>/etc/inetd.conf</TT
+>. If you want to be very careful you
+may wish to use the secure (-s) option of tftpd, this chroots to the
+specified directory, but then your pathnames in
+<TT
+CLASS="filename"
+>/etc/dhcpd.conf</TT
+> must be relative to the new root
+directory.
+
+</P
+><P
+>&#13;If you are booting many clients you should be aware of the limitations
+of running tftpd from inetd. Typically inetd has limits on how often a
+daemon can be spawned, to detect runaway daemons. If many clients
+request the tftp service within a short period, inetd may shutdown that
+service.  If you have a setup where there are many clients, it may be
+better to use an improved replacement for inetd, such as xinetd.
+Another possibility is to install a better tftp daemon like atftp at the
+Etherboot web site. This one can be run as a standalone daemon, avoiding
+*inetd limitations and it multithreads internally.
+
+</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x91.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x186.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Unpacking, compiling and testing the package</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Testing the network booting</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

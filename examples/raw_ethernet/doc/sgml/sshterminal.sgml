@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<article>
+
+<articleinfo>
+<title>Serving SSH sessions</title>
+<author>
+<firstname>Ken Yap, ken_yap AT users PERIOD sourceforge PERIOD net</firstname>
+</author>
+<pubdate>7 January 1999</pubdate>
+
+<abstract>
+
+<para>
+This document shows how to provide a login session that directly
+connects to remote hosts with SSH.
+</para>
+</abstract>
+</articleinfo>
+
+<para>
+I wanted a login program that would connect the user directly to a remote
+host with SSH. At first I thought of writing my own login program, then
+I remembered that mgetty could be configured to call any login program.
+So here's what I did:
+
+</para>
+<para>
+In <filename>/etc/mgetty+sendfax/login.config</filename> I added the line:
+
+</para>
+<para>
+
+<programlisting>
+*@*		sshguest	@	/usr/local/etc/mgetty-ssh @
+</programlisting>
+
+</para>
+<para>
+In <filename>/etc/inittab</filename> I added the line:
+
+</para>
+<para>
+
+<programlisting>
+8:35:respawn:/sbin/mgetty -r tty8
+</programlisting>
+
+</para>
+<para>
+I picked a free virtual tty, you may want to expand this to other
+ttys later.
+
+</para>
+<para>
+In <filename>etc/mgetty+sendfax/mgetty.config</filename> I added the
+lines:
+
+</para>
+<para>
+
+<programlisting>
+port tty8
+toggle-dtr n
+ignore-carrier y
+blocking y
+direct y
+login-time -1
+</programlisting>
+
+</para>
+<para>
+Thanks to Gert Doering (mgetty author) for the advice on the above
+settings.
+
+</para>
+<para>
+I added this user to <filename>/etc/passwd</filename>:
+
+</para>
+<para>
+
+<programlisting>
+sshguest:*:199:199:SSH guest:/tmp:
+</programlisting>
+
+</para>
+<para>
+If you are using shadow passwords you should also add an entry to
+<filename>/etc/shadow</filename>.
+
+</para>
+<para>
+The <filename>mgetty-ssh</filename> Perl script mentioned above is:
+
+</para>
+<para>
+
+<programlisting>
+#!/usr/bin/perl
+die "No argument\n" if !defined($ARGV[0]);
+($name, $host) = split /@/, $ARGV[0];
+# remove leading non-alphanums from name and host to prevent
+# masquerading as arguments
+$name =~ s/^[^a-z0-9]*//;
+$host =~ s/^[^a-z0-9]*//;
+# remove whitespace as well
+$name =~ s/[ \t\f]//g;
+$host =~ s/[ \t\f]//g;
+# limit length of strings
+$name = substr($name, 0, 64);
+$host = substr($host, 0, 256);
+# do we have anything left?
+die "Name or host null\n" if ($name eq '' or $host eq '');
+exec '/usr/bin/ssh', '-e', 'none', '-o', 'FallBackToRsh=no',
+	'-o', 'StrictHostKeyChecking=yes', '-l', $name, $host;
+</programlisting>
+
+</para>
+<para>
+Make sure this script is executable. If you are concerned that Perl
+takes up too much resources for a transient script, feel free to write
+the C equivalent.
+
+</para>
+<para>
+Make sure any remote hosts you want to connect to have their public keys
+in <filename>/etc/ssh/ssh_known_hosts</filename>
+
+</para>
+<para>
+Now on tty8 enter user@remote as the login name. You will get the
+following:
+
+</para>
+<para>
+
+<programlisting>
+Red Hat Linux release 5.2 (Apollo)
+Kernel 2.0.36 on an i486
+
+login: user@remote
+user@remote's password:
+Last login: Fri Dec 25 10:34:12 1998 from xterm.foo.com.au
+No mail.
+[user@remote user]$
+</programlisting>
+
+</para>
+<para>
+After I did this for mgetty, Peter Samuel pointed me to rungetty
+which is essentially an enhanced mingetty but can invoke programs other
+than login. Unlike mgetty, rungetty does not have any pattern matching
+facilities on the login name or indeed any means of passing the login
+name to the script. We get around this by prompting for the name in the
+script itself.
+
+</para>
+<para>
+In <filename>/etc/inittab</filename>, add the line:
+
+</para>
+<para>
+
+<programlisting>
+8:35:respawn:/usr/local/sbin/rungetty -u sshguest tty8 -- /usr/local/etc/rungetty-ssh
+</programlisting>
+
+</para>
+<para>
+The <filename>rungetty-ssh</filename> script is essentially the same as
+the <filename>mgetty-ssh</filename> script but with a section to prompt
+for the login name:
+
+</para>
+<para>
+
+<programlisting>
+#!/usr/bin/perl
+$| = 1;
+do {
+	print "SSH to user\@host: ";
+} while (!defined(sysread(STDIN, $_, 100)));
+chomp($_);
+($name, $host) = split /@/, $_;
+# remove leading non-alphanums from name and host to prevent
+# masquerading as arguments
+$name =~ s/^[^a-z0-9]*//;
+$host =~ s/^[^a-z0-9]*//;
+# remove whitespace as well
+$name =~ s/[ \t\f]//g;
+$host =~ s/[ \t\f]//g;
+# limit length of strings
+$name = substr($name, 0, 64);
+$host = substr($host, 0, 256);
+# do we have anything left?
+die "Name or host null\n" if ($name eq '' or $host eq '');
+exec '/usr/bin/ssh', '-e', 'none', '-o', 'FallBackToRsh=no',
+	'-o', 'StrictHostKeyChecking=yes', '-l', $name, $host;
+</programlisting>
+
+</para>
+<para>
+The disadvantage is that when the prompt is active, this Perl script is
+always running. This offsets the gains made by using the lighter
+rungetty in place of mgetty. You may prefer to rewrite this in C to keep
+it very light.
+
+</para>
+<para>
+This technique could be used on diskless workstations to provide login
+sessions to remote hosts.
+
+</para>
+</article>

@@ -1,0 +1,165 @@
+<HTML
+><HEAD
+><TITLE
+>PASSWORDS PROTECTED BOOT-PROMS</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="UP"
+TITLE="Security, 1 July 1997"
+HREF="a784.html"><LINK
+REL="PREVIOUS"
+TITLE="PC ARCHITECTURE"
+HREF="x795.html"><LINK
+REL="NEXT"
+TITLE="BOOTING DOS"
+HREF="x810.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x795.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>C. Security, 1 July 1997</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x810.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN806"
+></A
+>PASSWORDS PROTECTED BOOT-PROMS</H1
+><P
+>&#13;Password protected BOOT-Proms are  a considerable improvement over the
+standard security measures  offered by the  PC architecture,  but they
+are still vulnerable  to a variety  of attacks. Most of  these attacks
+are related to the weaknesses of the BOOTP and TFTP protocol and these
+issues are discussed in another section of text.
+</P
+><P
+>&#13;As the BOOT-Prom cannot store the passwords locally, it has to request
+them from the BOOTP/TFTP server.  The  BOOTP and TFTP protocols do not
+allow for any elaborate  challenge/response authorization scheme. Thus
+the BOOT-Prom  requests the password from  the server and subsequently
+compares it   with the password   as  input by  the user.   As packets
+transmitted on the ethernet can  easily be monitored, the server sends
+a MD5 message  digest (as invented  by Ron  Rivest/"RSA Data Security,
+Inc.")  of the actual password.  The  BOOT-Prom computes the MD5 value
+for the user   input and compares  these two values.  It is  generally
+believed that there is no way of  computing a valid  plain text from a
+known   MD5 message digest,   other    than comparing it against   all
+conceivable  input texts.   Thus, this  approach  is still  vulnerable
+against  dictionary attacks. You should   aim for using long passwords
+(although,  anything beyond 20  characters is unlikely to considerably
+improve the security of  the  password) which are   not listed in  any
+dictionary.   Make  sure that  these passwords  are memorized  and not
+available in un-encrypted form. Replace the passwords regularly and do
+not offer  more menu  entries in the   BOOTP data than are  absolutely
+necessary.
+</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x795.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x810.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>PC ARCHITECTURE</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="a784.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>BOOTING DOS</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

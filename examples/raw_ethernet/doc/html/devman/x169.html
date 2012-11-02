@@ -1,0 +1,396 @@
+<HTML
+><HEAD
+><TITLE
+>The architecture of Etherboot</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+TITLE="The execution environment of Etherboot"
+HREF="extension.html"><LINK
+REL="NEXT"
+TITLE="The development environment of Etherboot"
+HREF="x233.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="extension.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x233.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN169"
+></A
+>The architecture of Etherboot</H1
+><P
+>&#13;Leaving aside the peripheral code for the loaders, the rest of Etherboot
+can be divided into the core, the drivers and miscellaneous (catch-all
+category).
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;	+------------------+------------------+
+	|  Etherboot core  |   Miscellaneous  |
+	+------------------+------------------+
+	|           Driver support            |
+	+-------------------------------------+
+	|           Hardware drivers          |
+	+-------------------------------------+
+	|              Hardware               |
+	+-------------------------------------+
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+These parts are mapped on the directory structure in the <TT
+CLASS="filename"
+>src</TT
+>
+directory as follows:
+<P
+></P
+><UL
+><LI
+><P
+><TT
+CLASS="filename"
+>arch</TT
+>: Architecture specific files.
+Each architecture has an own subdirectory, currently we have <TT
+CLASS="filename"
+>i386</TT
+>
+and <TT
+CLASS="filename"
+>ia64</TT
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="filename"
+>bin</TT
+>: The directory where all binary files are built.</P
+></LI
+><LI
+><P
+><TT
+CLASS="filename"
+>core</TT
+>: Etherboot core.</P
+></LI
+><LI
+><P
+><TT
+CLASS="filename"
+>drivers/disk</TT
+>: Drivers for floppies and hard disks.</P
+></LI
+><LI
+><P
+><TT
+CLASS="filename"
+>drivers/net</TT
+>: Drivers for NICs.</P
+></LI
+><LI
+><P
+><TT
+CLASS="filename"
+>firmware</TT
+>: BIOS-specific files.</P
+></LI
+><LI
+><P
+><TT
+CLASS="filename"
+>include</TT
+>: Include files.</P
+></LI
+><LI
+><P
+><TT
+CLASS="filename"
+>util</TT
+>: Utility programs that are needed for building, but not included in the resulting roms.</P
+></LI
+></UL
+>
+These directories are duplicated under <TT
+CLASS="filename"
+>arch</TT
+> where appropriate.
+</P
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN202"
+></A
+>Etherboot core</H2
+><P
+>&#13;The core of Etherboot handles the protocol for obtaining a network
+identity and for loading data over the network.  This comprises the
+files <TT
+CLASS="filename"
+>main.c</TT
+> (main program)
+<TT
+CLASS="filename"
+>config.c</TT
+> (probe routines),
+<TT
+CLASS="filename"
+>osloader.c</TT
+> (support for various load image
+formats), <TT
+CLASS="filename"
+>nfs.c, proto*.c</TT
+> (support for network I/O)
+and <TT
+CLASS="filename"
+>vsprintf.c</TT
+> (printing routines). (More here.)
+
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN210"
+></A
+>Drivers</H2
+><P
+>&#13;Generally each file represents a family of network adapters. For example
+<TT
+CLASS="filename"
+>tulip.c</TT
+> handles all adapters that use a Tulip
+compatible network controller, even if they are from different
+manufacturers. <TT
+CLASS="filename"
+>3c90x.c</TT
+> handles a whole family of
+related adapters from 3Com.
+
+</P
+><P
+>&#13;The interface between the core and the drivers is well-defined and
+explained in <A
+HREF="driver.html"
+>the Section called <I
+>Writing an Etherboot Driver</I
+></A
+>.
+
+</P
+><P
+>&#13;The files <TT
+CLASS="filename"
+>timer.h</TT
+> and <TT
+CLASS="filename"
+>timer.c</TT
+>
+provide routines for access to the second hardware timer of the PC. This
+is used for implementing microsecond timeouts.
+
+</P
+><P
+>&#13;The files <TT
+CLASS="filename"
+>pci.h</TT
+> and <TT
+CLASS="filename"
+>pci.c</TT
+>
+provide a PCI initialisation subsystem that is executed for PCI
+adapters.
+
+</P
+><P
+>&#13;<TT
+CLASS="filename"
+>skel.c</TT
+> is a skeleton driver that an aspiring driver
+writer can use as a starting point.
+
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN225"
+></A
+>Miscellaneous</H2
+><P
+>&#13;In this category are all the files that don't fit into the first two
+categories.
+
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN228"
+></A
+>External auxiliary programs</H2
+><P
+>&#13;In Etherboot 5.0 and later there is the facility to load and run
+external auxiliary programs. As Etherboot runs in high memory. All the
+memory below that and above 0x10000 is fair game for loading. What if we
+did not load the target operating system but instead loaded an external
+program, one that returned to Etherboot after doing something. This
+something could be a fancy menu system.  The advantage of this approach
+is that the menu system does not have to be compiled into Etherboot,
+which means it can be changed without changing ROMs, and can be much
+larger.
+
+</P
+><P
+>&#13;How does such a menu program indicate to Etherboot which image is to be
+loaded next? Several new features of Etherboot make this possible.
+Firstly, a bit in the header of the loaded image is used to indicate
+that the loaded program intends to return to Etherboot, as opposed to
+never returning, in the case of an operating system. Next, the external
+program is passed a pointer to the BOOTP/DHCP structure obtained by
+Etherboot, which includes the filename field. Finally, the external
+program can return one longword of status to Etherboot to indicate
+various conditions.
+
+</P
+><P
+>&#13;So here's how the external menu program would work. Etherboot is told to
+load an image which is a menu program. The program would present the
+user with a list of images to choose from. The presentation can be as
+simple as a numbered menu or as fancy as a point and click interface (if
+you can arrange to interface to the pointer). When a particular image
+has been chosen, the menu program alters the filename field in the
+BOOTP/DHCP structure and returns a longword of status indicating that
+Etherboot should retry the loading. Since the filename has been altered,
+Etherboot will end up loading the desired image instead of the menu this
+time around. Think of it as a program chaining facility.
+
+</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="extension.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x233.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>The execution environment of Etherboot</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>The development environment of Etherboot</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

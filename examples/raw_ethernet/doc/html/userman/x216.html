@@ -1,0 +1,180 @@
+<HTML
+><HEAD
+><TITLE
+>Booting DOS</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+TITLE="Testing the network booting"
+HREF="x186.html"><LINK
+REL="NEXT"
+TITLE="Making an Etherboot EPROM or EEPROM"
+HREF="x225.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x186.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x225.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN216"
+></A
+>Booting DOS</H1
+><P
+>&#13;What about DOS? The deal with DOS is that one is loading a virtual
+floppy called A: into extended memory and then booting from this floppy.
+So you have to capture an image of a bootable DOS floppy first.  Some
+more details can be found in the <A
+HREF="../mknbi.html"
+TARGET="_top"
+>mknbi-dos</A
+> utility.
+
+</P
+><P
+>&#13;I have booted DOS (both M$ versions up to 5.0 and DR versions up to
+7.03) diskless this way.  A <A
+HREF="../mknbi.html"
+TARGET="_top"
+>mknbi-fdos</A
+> is available for building boot
+images for booting FreeDOS, the procedure differs slightly from booting
+M$ or DR DOS.
+
+</P
+><P
+>&#13;If you were thinking of booting a Windows machine via the network, it
+seems (I'm not masochistic enough to do this) the problem is not the
+network booting but the mounting of a file system over NetBIOS (Windows
+does not do remote mounts of root filesystems over NetBIOS on TCP). So
+that rules out a Samba server. It appears to be possible over a Netware
+server, for which Linux or FreeBSD has workalikes. Also it is said that
+only certain versions of Windows will allow diskless booting.  You will
+also have problems with pathnames and the usual Windows hassles. Do you
+really want to do this?  You do know that you can run lots of desktop
+applications like Netscape, StarOffice, etc. on Linux, FreeBSD, etc.
+now? Why pay good money when you can use equally good free replacements?
+Anyway if you are still determined, in the <A
+HREF="http://www.etherboot.org/"
+TARGET="_top"
+>Etherboot home page</A
+>, there are
+links to external Web pages, one explaining how this was done with a
+commercial TCP/IP boot ROM, another explaining how to do it using
+Etherboot and Netbios over IPX. A recent user experience is <A
+HREF="http://www.geocrawler.com/lists/3/SourceForge/5299/0/8052616/"
+TARGET="_top"
+>here</A
+>.
+Good luck and send us your experiences or better still a URL to a page
+explaining how you did it.
+
+</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x186.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x225.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Testing the network booting</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Making an Etherboot EPROM or EEPROM</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,17 @@
+Converted to Docbook for 5.2. Removed old documents (16 bit, AT, old
+README). Fixed DOCTYPE, dead links and entities. Merged some documents
+into userman and devman.
+
+Released as Etherboot-doc 5.2.0
+
++ More fixes, added to acknowledgements.
+
++ Fixed CSS problem for <ul> items. Thanks to Timothy Legge.
+
++ Broken link in mailinglist.html fixed. Spotted by Timothy Legge.
+
++ Add missing acknowledgements.
+
++ Make Wiki top level link from LHS menu.
+
+Released as Etherboot-doc 5.2.2

@@ -1,0 +1,299 @@
+<HTML
+><HEAD
+><TITLE
+>Testing the network booting</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+TITLE="Setting up a diskless boot"
+HREF="x126.html"><LINK
+REL="NEXT"
+TITLE="Booting DOS"
+HREF="x216.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x126.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x216.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN186"
+></A
+>Testing the network booting</H1
+><P
+>&#13;Now when you start up Etherboot, it should obtain an IP address and
+print out what it received. If you do not get this to work, turn on
+debugging in DHCPD and see if any query was received. You may also wish
+to use the tcpdump or ethereal utilities to watch the network for DHCP
+packets (port bootps).  If not, check your network hardware (cables,
+etc). If a query was received, check if DHCPD was able to give an
+answer. If not, then the Ethernet address was not found in
+<TT
+CLASS="filename"
+>/etc/dhcpd.conf</TT
+>. If a reply was sent, then only
+faulty hardware or a bug in Etherboot would prevent it being received by
+Etherboot.
+
+</P
+><P
+>&#13;Assuming an IP address was received, the next thing Etherboot tries to
+do is load a file using tftp. Check your system logs to see if a tftp
+daemon was started up and a file requested. Generally if you run tftpd
+under tcpwrapper security, a log entry will be generated. If not, it
+could be a path problem or file permission problem (the file needs to be
+readable by tftpd). Another problem could be that tftpd needs to reverse
+map the IP address to a name for security checking, and you don't have
+the client's details in <TT
+CLASS="filename"
+>/etc/hosts</TT
+> or in DNS, or
+your tcpwrapper config files (<TT
+CLASS="filename"
+>/etc/hosts.deny</TT
+>,
+<TT
+CLASS="filename"
+>/etc/hosts/allow</TT
+>) do not allow the access. Fix the
+problem.
+
+</P
+><P
+>&#13;After the boot image is loaded, Etherboot will jump to it. If it
+crashes here, check that the image is a boot image. If it executes and
+stops at the point where it's trying to mount NFS filesystems, then
+you need to check your NFS mounts. Another common problem is the shared
+libraries on the NFS partition are not suitable for your CPU, e.g. i586
+libraries but a 486 diskless client.
+
+</P
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN195"
+></A
+>Setting up an initrd filesystem</H2
+><P
+>&#13;Recent advances in the Linux kernel (2.4 and above) have made the use of
+an initrd that does user space autoconfiguration and mounting of a NFS
+root filesystem, followed by a pivot_root, a more flexible alternative
+to kernel autoconfiguration and mounting of a NFS root filesystem.
+Postings on the kernel mailing lists indicate that at some point in the
+future, kernel level autoconfiguration (BOOTP/DHCP from the kernel) may
+be removed from the Linux kernel and initrds will be the recommended way
+to start up a diskless system.
+
+</P
+><P
+>&#13;Until I have time to write detailed instructions on how to construct the
+initrd, I refer you to the <A
+HREF="http://www.ltsp.org/"
+TARGET="_top"
+>LTSP
+distribution</A
+> which uses this technique. Mknbi supports initrds,
+see the ramdisk argument of <A
+HREF="../mknbi.html"
+TARGET="_top"
+>mkelf-linux</A
+>.  The Linux kernel documentation
+describes the extra arguments should be passed to the kernel to make it
+use an initrd, and how to arrange the initrd so that the startup script
+within it is called when it's mounted. If the initrd mounts a NFS root
+filesystem then it should still have all the needed structure as
+explained in the next section.
+
+</P
+><P
+>&#13;Initrds can also be used for mounting other network filesystems instead
+of NFS root.  Some applications could even run totally out of initrd,
+e.g.  <A
+HREF="http://www.zelow.no/floppyfw/"
+TARGET="_top"
+>Floppy
+Firewall</A
+>, provided you have the memory, of course.
+
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN203"
+></A
+>Other filesystem setups</H2
+><P
+>&#13;This tutorial does not cover all possible ways of setting up a diskless
+client's initial filesystem.  You could even mount a conventional hard
+disk.  Why would you want to boot "diskless" if you have a hard disk?
+Reasons might be: you do not wish to administer the local disk; you want
+the assurance that a system is running a kernel from a central server;
+or you like the speed of network booting.  Network booting is one
+technique in a toolbox. Techniques can be combined to do what you want.
+If you are interested in running the diskless client as an X-terminal, a
+very common use, you may wish to investigate the <A
+HREF="http://www.ltsp.org/"
+TARGET="_top"
+>Linux Terminal Server Project</A
+>.
+
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN207"
+></A
+>Swap over NFS</H2
+><P
+>&#13;Swap over NFS can be arranged but you have to patch the kernel source.
+See <A
+HREF="http://nfs-swap.dot-heine.de"
+TARGET="_top"
+>here</A
+>.
+
+</P
+><P
+>&#13;Be aware that opinions are divided on NFS swap.  Some people think it's
+a bad thing because it just kills the network if you have lots of
+diskless computers and that you shouldn't be running into a swap regime
+on a diskless computer anyway. Some other people like having a bit of
+insurance.
+
+</P
+><P
+>&#13;Also have a look at the <A
+HREF="http://atrey.karlin.mff.cuni.cz/~pavel/nbd/nbd.html"
+TARGET="_top"
+>NBD</A
+>
+Network Block Device for swapping over that.
+
+</P
+><P
+>&#13;There is also the follow-on project <A
+HREF="http://www.it.uc3m.es/~ptb/nbd/"
+TARGET="_top"
+>ENBD</A
+>, the Enhanced Network
+Block Driver. I have no experience with this for swapping. Comments
+welcome.
+
+</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x126.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x216.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Setting up a diskless boot</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Booting DOS</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,414 @@
+<HTML
+><HEAD
+><TITLE
+>Unpacking, compiling and testing the package</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+TITLE="Introduction to Etherboot"
+HREF="x60.html"><LINK
+REL="NEXT"
+TITLE="Setting up a diskless boot"
+HREF="x126.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x60.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x126.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN91"
+></A
+>Unpacking, compiling and testing the package</H1
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN93"
+></A
+>A short cut to getting Etherboot images</H2
+><P
+>&#13;Marty Connor has set up a <A
+HREF="http://rom-o-matic.net/"
+TARGET="_top"
+>web
+form</A
+> for creating an Etherboot image on the fly and returning it
+as the output of the form. If all you want is an Etherboot image, this
+could save you having to build the distribution.
+
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN97"
+></A
+>Unpacking the distribution</H2
+><P
+>&#13;Unpack the distribution using gunzip and tar, using one of the following
+commands, where you replace x by the patchlevel number:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;	tar zxvf etherboot-5.2.x.tar.gz
+	tar jxvf etherboot-5.2.x.tar.bz2
+	gunzip &#60; etherboot-5.2.x.tar.gz | tar xvf -
+	bunzip2 &#60; etherboot-5.2.x.tar.bz2 | tar xvf -
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+If the documentation tarball was provided separately, then in addition
+do this:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;	cd etherboot-5.2.x
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+followed by one of the following:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;	tar zxvf ../etherboot-doc-5.2.x.tar.gz
+	tar jxvf ../etherboot-doc-5.2.x.tar.bz2
+	gunzip &#60; ../etherboot-doc-5.2.x.tar.gz | tar xvf -
+	bunzip2 &#60; ../etherboot-doc-5.2.x.tar.bz2 | tar xvf -
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+which will extract the documentation in a subdirectory of the Etherboot
+top directory.
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN103"
+></A
+>Making an Etherboot image</H2
+><P
+>&#13;To build an Etherboot image you need a recent release of gcc and the
+binutils tools. This package has been compiled with the tools from a
+SuSE 8.2 distribution but it should work with any recent Linux or
+FreeBSD distribution. gas 2.9.1 is too old to handle the 16-bit code in
+loader.S. Use gas 2.9.5 at least. Also the "gcc 2.96" used in RedHat 7.0
+(and later versions maybe) generates faulty machine code compiling
+Etherboot.  Use kgcc from those distributions instead.
+
+</P
+><P
+>&#13;Go to src/, edit the options in Config and make the image that you want.
+A full list of options is in Appendix B. We suggest you accept the
+default options for now if you are not sure what to select.  Unlike 5.0,
+5.2 does not make all the images by default, you have to explicitly
+state which ones you want.
+
+</P
+><P
+>&#13;You can test the image with a floppy before programming a ROM. On
+Linux just put a blank floppy in fd0 and say
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;	make bin/<TT
+CLASS="replaceable"
+><I
+>card</I
+></TT
+>.zfd0
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+where <TT
+CLASS="replaceable"
+><I
+>card</I
+></TT
+> is the name of your network card
+and it will copy a bootable image onto the floppy. If you wish to do
+this by hand, perhaps because your floppy drive is elsewhere, just make
+bin/<TT
+CLASS="replaceable"
+><I
+>card</I
+></TT
+>.zdsk and copy this binary to the
+floppy raw, i.e. starting at the boot block.
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;	cat bin/3c509.zdsk &#62; /dev/fd0
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+You can also use utilities such as rawrite to write the image onto the
+floppy.
+
+</P
+><P
+>&#13;Make sure the floppy has no bad blocks. It is best if it has been
+formatted just before use. You do not need to put any kind of filesystem
+on it. If you wish, you could substitute /dev/fd0 with the actual device
+suitable for the floppy size you are using, for example /dev/fd0H1440
+for 1.44 MB floppies. This may be more reliable than using the
+autodetecting device /dev/fd0.
+
+</P
+><P
+>&#13;When you boot with this floppy it will load the Etherboot image from
+floppy and execute it. If you chose the correct image, it should be able
+to detect your card. To get the bootrom to acquire an IP address and
+load the intended code, you need to set up DHCP, tftp and NFS services,
+which we will discuss in the next section.  We suggest you continue to
+use floppy booting until you have completed the setup of the server and
+are satisfied that diskless booting works.
+
+</P
+><P
+>&#13;In addition, you can generate images with the suffixes .zlilo, .zpxe,
+.com, and .zrom by saying:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;	make bin/3c509.zlilo
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+and so forth.
+
+</P
+><P
+>&#13;The ones ending in .zlilo look sufficiently like Linux kernel
+images to be accepted by LILO, GRUB and SYSLINUX for installation.
+Unfortunately loadlin uses a slightly different method of booting for
+Linux kernels from LILO and SYSLINUX and will not work with these
+images.
+
+</P
+><P
+>&#13;The fact that .zlilo images look like a Linux kernel to LILO and
+SYSLINUX allows some interesting booting possibilities. For example, you
+could use LILO to select between DOS/Windows and Etherboot images from a
+disk that contains no Linux partitions, only FAT based partitions. This
+<A
+HREF="../lilo+etherboot/t1.html"
+TARGET="_top"
+>HOWTO</A
+> shows you how
+this can be arranged.
+
+</P
+><P
+>&#13;The ones ending in .zpxe can be booted by a PXE booter. This is useful
+to chain to Etherboot from PXE. <A
+HREF="http://www.geocrawler.com/lists/3/SourceForge/5299/125/6129709/"
+TARGET="_top"
+>Here</A
+> are some notes on how to combine PXE and Etherboot.
+
+</P
+><P
+>&#13;The ones ending in .com are DOS format executables, suitable for
+starting from DOS. It requires a real DOS environment, not a virtual DOS
+environment such as that provided by the DOS prompt window under
+Windows. Also it requires that there be no XMS drivers or other memory
+handlers loaded. It is not guaranteed to work if the environment is not
+clean, and sometimes not even if it is. The best chance of this format
+working is when DOS is booted with no device drivers whatsoever.  If you
+can, use raw floppy or an intermediate bootloader for booting instead.
+
+</P
+><P
+>&#13;The ones ending in .zrom are images suitable for writing onto ROMs.  If
+you are making a .zrom image, you must set the PCI vendor and device IDs
+correctly for PCI NICs. Look at the file NIC. Locate the line that has
+the correct PCI IDs for your NIC. This will give you the name of the ROM
+image you should use.  The PCI IDs are usually displayed by the BIOS on
+booting up. They can also be read out from a running Linux system using
+the <A
+HREF="http://atrey.karlin.mff.cuni.cz/~mj/pciutils.shtml"
+TARGET="_top"
+>Linux PCI
+Utilities</A
+>.  If you do not use the ROM with the correct IDs, the
+floppy version will work, but the ROM will not since the BIOS will check
+for a match.
+
+</P
+><P
+>&#13;There are also .fd0, .dsk, .lilo, .pxe and .rom counterparts to the .z*
+versions of the images. The difference is the .z* versions are
+compressed. Unless you doubt the (de)compression process, there is
+usually no reason to use the uncompressed versions..
+
+</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x60.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x126.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Introduction to Etherboot</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Setting up a diskless boot</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

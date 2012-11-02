@@ -1,0 +1,211 @@
+<HTML
+><HEAD
+><TITLE
+>How does it work?</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+HREF="t1.html"><LINK
+REL="NEXT"
+TITLE="Server setup"
+HREF="server.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="t1.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="server.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="How"
+></A
+>How does it work?</H1
+><P
+>&#13;
+<P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;Diskless computer (DC) broadcasts MAC address with bootp: Who am I?
+
+</P
+></LI
+><LI
+><P
+>&#13;DHCP server on S looks up DB: Your IP address is X.X.X.X, your server is
+S, your boot file is <TT
+CLASS="filename"
+>vmlinuz.myname</TT
+>, etc.
+
+</P
+></LI
+><LI
+><P
+>&#13;DC asks to load file from TFTP server on S: Please give me
+<TT
+CLASS="filename"
+>vmlinuz.myname</TT
+>
+
+</P
+></LI
+><LI
+><P
+>&#13;S: Here you are (<TT
+CLASS="filename"
+>/tftpdir/vmlinuz.myname</TT
+>)
+
+</P
+><P
+>&#13;DC thinks a while (booting Linux).
+
+</P
+></LI
+><LI
+><P
+>&#13;DC: Please let me mount <TT
+CLASS="filename"
+>/</TT
+> with NFS
+
+</P
+></LI
+><LI
+><P
+>&#13;DC: Please let me mount other NFSes (<TT
+CLASS="filename"
+>/usr, /home/</TT
+>, etc)
+
+</P
+></LI
+><LI
+><P
+>&#13;S: Here you are
+
+</P
+></LI
+><LI
+><P
+>&#13;DC: Runs intended application
+
+</P
+></LI
+></OL
+>
+</P
+><P
+>&#13;Network boot ROM contains code to do 1 and 3.
+
+</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="server.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Server setup</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

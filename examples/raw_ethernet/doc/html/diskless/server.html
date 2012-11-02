@@ -1,0 +1,266 @@
+<HTML
+><HEAD
+><TITLE
+>Server setup</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+TITLE="How does it work?"
+HREF="how.html"><LINK
+REL="NEXT"
+TITLE="Net loader"
+HREF="netloader.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="how.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="netloader.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="Server"
+></A
+>Server setup</H1
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN48"
+></A
+>Bootpd setup</H2
+><P
+>&#13;
+<P
+></P
+><UL
+><LI
+><P
+>&#13;(In 2003: DHCPD is preferred.)  Install bootpd
+
+</P
+></LI
+><LI
+><P
+>&#13;Edit <TT
+CLASS="filename"
+>/etc/bootptab</TT
+>, typical line
+
+</P
+></LI
+></UL
+>
+
+</P
+><P
+>&#13;
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;xterm.ken.net.au:tc=.default:ht=ethernet:ha=08002BB7F380:\
+	ip=192.168.0.100:bf=vmlinuz.xterm
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN59"
+></A
+>Tftpd setup</H2
+><P
+>&#13;
+<P
+></P
+><UL
+><LI
+><P
+>&#13;Install tftpd, make sure it's active in
+<TT
+CLASS="filename"
+>/etc/inetd.conf</TT
+>, typical line
+
+</P
+></LI
+></UL
+>
+</P
+><P
+>&#13;
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;tftp dgram udp wait root /usr/sbin/tcpd in.tftpd /tftpdir
+</PRE
+></TD
+></TR
+></TABLE
+>
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN68"
+></A
+>Kernel image</H2
+><P
+>&#13;(In 2003: The preferred method is to download along with the kernel
+a ramdisk that sets up a initial root filesystem, which is then used
+to mount the real root filesystem.  www.ltsp.org does it this way.)
+
+</P
+><P
+>&#13;After building the kernel and ramdisk, run
+<TT
+CLASS="filename"
+>mkelf-linux</TT
+> from the Etherboot distribution on it.
+Install this <SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>boot image</I
+></SPAN
+> as
+<TT
+CLASS="filename"
+>/tftpdir/</TT
+><TT
+CLASS="replaceable"
+><I
+>&#60;bf attribute in
+bootptab&#62;</I
+></TT
+>.
+
+</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="how.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="netloader.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>How does it work?</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Net loader</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

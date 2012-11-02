@@ -1,0 +1,798 @@
+<HTML
+><HEAD
+><TITLE
+>VendorTag extensions, 28 April 2001</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+TITLE="CONCLUSION"
+HREF="x835.html"></HEAD
+><BODY
+CLASS="appendix"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x835.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+>&nbsp;</TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="appendix"
+><H1
+CLASS="appendix"
+><A
+NAME="AEN838"
+></A
+>D. VendorTag extensions, 28 April 2001</H1
+><P
+>&#13;Markus Gutschke, gutschk AT math PERIOD uni-muenster PERIOD
+de with changes by Ken Yap, ken_yap AT users PERIOD
+sourceforge PERIOD net
+</P
+><P
+>&#13;This documentation has been written and is copyrighted 1996,97 by Markus
+Gutschke &#60;gutschk AT math PERIOD uni-muenster PERIOD de&#62;. You are
+free to distribute this file as long as you do not change its contents.
+I appreciate comments and will consider them in future revisions. If you
+have any questions, comments, or suggestions, please also send carbon
+copies of your e-mail message to both Ken Yap &#60;ken_yap AT users
+PERIOD sourceforge PERIOD net&#62; and Gero Kuhlmann &#60;gero AT gkminix
+PERIOD han PERIOD de&#62;. I will happily include any of your extensions,
+but I would like to avoid the proliferation of different incompatible
+revisions of this document. If these conditions are a problem to you,
+then feel free to contact me.
+
+</P
+><P
+>&#13;RFC1533 allows for vendor-specific extensions to the BOOTP protocol. It
+defines that all tags in the range 128 thru 254 are set aside for
+site-specific extensions. Common implementations of DHCP daemons can
+assign arbitrary null-terminated character strings to these tags.
+
+</P
+><P
+>&#13;This is a list of the tags that are currently used by Etherboot.  Tag
+128 and 129 are handled by Etherboot. The other tags are handled by an
+external menu program, generated using mkelf-menu. This is changed
+behaviour from 5.0, where the menuing code was part of Etherboot.  As a
+general rule, you should never fill out any of the other tags, unless
+you positively know that your BOOT-Prom supports the extension or
+ignores this particular tag:
+
+</P
+><P
+>&#13;<P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>TAG 128</DT
+><DD
+><P
+>&#13;this is a six-byte hexadecimal entry. The first four bytes have to be
+the magic number E4 45 74 68; if this magic cannot be found, then none
+of the other vendor tags are valid! The fifth byte is the major version
+number and the sixth byte is the minor version number of this protocol
+extension. The current version is 0.0; the BOOT-Prom can assume that
+incompatible changes increase the major version number. Mere extensions
+to the existing protocol, increase the minor version number. If the
+BOOT-Prom code has been written in a way that anticipates future
+extensions, then it is acceptable to honor the vendor tags even though,
+the minor version number does not match exactly. Before making a change,
+that requires updating the major version number, you should contact all
+of the persons that are listed at the top of this document.
+
+</P
+></DD
+><DT
+>TAG 129</DT
+><DD
+><P
+>&#13;the BOOT-Prom uses this tag for passing a user-provided command line to
+Linux. Anything in this tag will be appended to the kernel parameters
+already in the boot image created by mkelf.
+
+</P
+></DD
+><DT
+>TAG 160</DT
+><DD
+><P
+>&#13;a string that contains a colon separated list of
+"parameter=value" pairs. Currently, these parameters are only
+used to control the behavior of an interactive menu for
+selecting different boot images; future extensions are quite
+likely:
+</P
+><P
+>&#13;<P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>timeout</DT
+><DD
+><P
+>&#13;after this many seconds, the default image will be
+loaded. If no 'timeout' has been set, then the
+program will wait indefinitely.
+</P
+></DD
+><DT
+>default</DT
+><DD
+><P
+>&#13;either an integer 'n' in the range 0 thru 15 or
+192 thru 207, selecting the default image. If 'n'
+is in the first range, it refers to the 'n'th menu
+entry; if it is in the later range, it refers to
+the entry with the tag number 'n'. This
+distinction is important, if the list of images
+contains gaps. If no value has been set, then the
+image with the lowest tag number will be the
+default image.
+</P
+></DD
+></DL
+></DIV
+>
+</P
+></DD
+><DT
+>TAGS 161 thru 174</DT
+><DD
+><P
+>&#13;these tags are currently unused, but they should be allocated
+for purposes that resemble the function of tag 160.
+</P
+></DD
+><DT
+>TAG 175</DT
+><DD
+><P
+>&#13;the BOOT-Prom uses this tag for telling the DHCP server which
+NIC driver it is using. The DHCP server can then modify the
+"filename" field in the DHCPACK packet in order to direct the
+BOOT-Prom to download an appropriate kernel image.
+</P
+></DD
+><DT
+>TAG 176</DT
+><DD
+><P
+>&#13;the BOOT-Prom uses this tag for telling the loaded operating
+system, which of the entries in tags 192 to 207 has been
+selected by the user. As this tag is used internally, the
+DHCP daemon must not assign any value to it!
+</P
+></DD
+><DT
+>TAGS 177 thru 183</DT
+><DD
+><P
+>&#13;these tags are reserved for passing information from the
+BOOT-Prom to the boot image. Under no circumstances should the
+DHCP daemon assign any of these entries. The format of
+these parameters is yet to be discussed.
+</P
+></DD
+><DT
+>TAGS 184 thru 191</DT
+><DD
+><P
+>&#13;up to eight zero-terminated character strings can be used for
+displaying a "message of the day". If you need to display more
+than eight lines, you can embed suitable CR/LF pairs. If you
+fully exploit that feature, you can display a complete 80x24
+screen of information, but you should be aware that subsequent
+output might scroll part of a long message.
+</P
+><P
+>&#13;The BOOT-Prom can optionally be configured to interpret some
+ANSI escape sequences.
+
+</P
+><P
+>&#13;The ANSI emulation currently knows about these commands:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;  Display attributes
+
+    Code          Effect
+    &#60;esc&#62;[0m      normal text
+    &#60;esc&#62;[1m      high-intensity on
+    &#60;esc&#62;[21m     high-intensity off
+    &#60;esc&#62;[5m      blinking on
+    &#60;esc&#62;[25m     blinking off
+    &#60;esc&#62;[7m      reverse video on
+    &#60;esc&#62;[27m     reverse video off
+    &#60;esc&#62;[3xm     set foreground color:
+    &#60;esc&#62;[4xm     set background color. x can be:
+		   0 - black                   4 - blue
+		   1 - red                     5 - magenta
+		   2 - green                   6 - cyan
+		   3 - yellow                  7 - white
+    &#60;esc&#62;[=xh     set video mode
+		   0 - 40x25 mono     (text)  13 - 40x25 16colors (gfx)
+		   1 - 40x25 16colors (text)  14 - 80x25 16colors (gfx)
+		   2 - 80x25 mono     (text)  15 - 80x25 mono     (gfx)
+		   3 - 80x25 16colors (text)  16 - 80x25 16colors (gfx)
+		   4 - 40x25 4colors  (gfx)   17 - 80x30 mono     (gfx)
+		   5 - 40x25 mono     (gfx)   18 - 80x30 16colors (gfx)
+		   6 - 80x25 mono     (gfx)   19 - 40x25 256colors(gfx)
+
+
+  Cursor control
+
+    Code          Effect
+    &#60;esc&#62;[r;cH    move cursor to row r and column c
+    &#60;esc&#62;[r;cf    move cursor to row r and column c
+    &#60;esc&#62;[rA      move cursor up r rows
+    &#60;esc&#62;[rB      move cursor down r rows
+    &#60;esc&#62;[cC      move cursor right c columns
+    &#60;esc&#62;[cD      move cursor left c columns
+    &#60;esc&#62;[?7l     turn off line wrap
+    &#60;esc&#62;[?7h     turn on line wrap
+    &#60;esc&#62;[J       clear screen and home cursor
+    &#60;esc&#62;[K       clear to end of line
+    &#60;esc&#62;[s       save the cursor position
+    &#60;esc&#62;[u       return cursor to saved position
+
+
+  Extended features
+
+    Code          Effect
+    &#60;esc&#62;[a;b;c;d+&#60;data&#62;
+		  draw pixel data.  Use  one byte  per  pixel.
+		  Colors are encoded as  shown above.  In text
+		  mode, graphics is approximated by outputting
+		  suitable    characters.  Parameters   differ
+		  depending    on  the number    of parameters
+		  passed:
+		    cnt
+		      "cnt"  data  bytes follow. They  will be
+		      drawn to  the right of the last graphics
+		      position.
+		    rle;col
+		      the next  "rle"  pixels  have the  value
+		      "col". They will  be drawn to  the right
+		      of the last  graphics position.  No data
+		      bytes follow.
+		    x;y;cnt
+		      "cnt" data  bytes  follow. They  will be
+		      drawn relative to the top left corner of
+		      the text cursor with an offset of (x/y).
+		    x;y;rle;col
+		      the next "rle"   pixels have  the  value
+		      "col".  They will  be drawn  relative to
+		      the top  left corner of the  text cursor
+		      with an offset  of (x/y).  No data bytes
+		      follow
+		  you usually   do not  have   to enter  these
+		  values manually, but you  should use  a tool
+		  such as  "ppmtoansi" which  is  shipped with
+		  your BOOT-Prom or available from the contrib
+		  directory of the "etherboot" package.
+    &#60;esc&#62;[a;b;c;d-&#60;data&#62;
+		  same as above,   but pack pixels into  three
+		  bits. The first pixel is stored in the three
+		  most  significant  bits  of the  first  data
+		  byte.
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+Note that you usually have to specify any control characters
+directly (rather than in hex form) in your
+<TT
+CLASS="filename"
+>/etc/dhcpd.conf</TT
+> file.
+</P
+></DD
+><DT
+>TAGS 192 thru 207</DT
+><DD
+><P
+>&#13;these tags define all of the valid boot images and override any settings
+that are given with the filename field in your
+<TT
+CLASS="filename"
+>/etc/dhcpd.conf</TT
+>. It is allowed to leave gaps in the
+list.  This has an impact on how the default image will be selected.
+
+</P
+><P
+>&#13;All entries are of the form
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;            label:server:gateway:filename:passwd:flags:cmdline
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+For future extensibility, it is permitted to append an
+arbitrary amount of other colon separated entries as long as
+the limit of 255 characters per tag is not exceeded.
+Non-existent entries can be left empty. This means that the
+default value for this particular entry will be used. Trailing
+colons can be omitted.
+</P
+><P
+>&#13;<P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>label</DT
+><DD
+><P
+>&#13;this is the text string that is displayed to the
+user. It can contain arbitrary characters, except
+for a colon. Embedding arbitrary control
+characters is not recommended, but you might be
+able to include ANSI escape sequences (if enabled
+in the ROM) for changing text attributes as long
+as you restore the attributes at the end of the
+string. It probably does not make very much sense
+to leave this entry empty.
+</P
+></DD
+><DT
+>server</DT
+><DD
+><P
+>&#13;(This field is no longer supported. Its contents will be ignored.)
+
+</P
+></DD
+><DT
+>gateway</DT
+><DD
+><P
+>&#13;(This field is no longer supported. Its contents will be ignored.)
+
+</P
+></DD
+><DT
+>filename</DT
+><DD
+><P
+>&#13;name of the boot image that has to be loaded by
+TFTP. If this entry is omitted, then the machine
+boots locally from disk. If enabled in the
+BOOT-Prom, you can specify pseudo-filenames for
+booting from a local blockdevice (floppy,
+harddisk, ...); these filenames have to match the
+pattern "/dev/[fh]d*". If the BOOT-Prom does not
+have support for these pseudo-filenames, you can
+still boot from blockdevices by storing an boot
+image as generated by mknbi-blkdev under the name
+of the desired blockdevice (symbolic links will
+do). In Etherboot 4.6.2 and later, a - in this field
+means use the filename specified in the BOOTP/DHCP reply.
+This saves on menu size.
+</P
+></DD
+><DT
+>passwd</DT
+><DD
+><P
+>&#13;MD5 message digest of the password. If this entry
+is omitted, then no password is required for
+loading this image. Support for passwords is
+optional and might not be compiled into the ROM
+image. For generating the MD5 message digest, you
+can use freely available tools such as
+"md5sum". C.f. the flags entry for controlling
+the behavior of passwords.
+</P
+></DD
+><DT
+>flags</DT
+><DD
+><P
+>&#13;flags are used for controlling some aspects of how
+the BOOT-Prom code behaves. All flags are a string
+of decimal digits followed by a letter; multiple
+flags can be concatenated. If this entry is
+omitted, then a default value of "1i1p" is
+assumed. Currently, these flags are defined:
+</P
+><P
+>&#13;<P
+></P
+><DIV
+CLASS="variablelist"
+><DL
+><DT
+>0i</DT
+><DD
+><P
+>&#13;booting this image does not require a
+password; the contents of the password
+entry is ignored unless some other feature
+(such as the flag "2p") requires it.
+</P
+></DD
+><DT
+>1i</DT
+><DD
+><P
+>&#13;booting this image requires a password. If
+the password entry is omitted, or no
+password support is available in the
+BOOT-Prom, then this flag is ignored.
+</P
+></DD
+><DT
+>0p</DT
+><DD
+><P
+>&#13;the user cannot enter a command line for
+passing parameters to the loaded image,
+even if this feature has been enabled when
+compiling the BOOT-Prom. N.B. this does not
+affect the cmdline entry as described
+below!
+</P
+></DD
+><DT
+>1p</DT
+><DD
+><P
+>&#13;the user does not get prompted for passing
+parameters to the loaded image, but he can
+explicitly request the prompt (e.g. by
+pressing a modifier key while selecting an
+image from the menu). If the password
+entry is not omitted, then the password has
+to be entered. Both parameter passing and
+password validation can be disabled when
+compiling the BOOT-Prom.
+</P
+></DD
+><DT
+>2p</DT
+><DD
+><P
+>&#13;the user always gets prompted for passing
+parameters to the loaded image. If the
+password entry is present and password
+support has been enabled in the BOOT-Prom,
+then the password has to be entered.
+</P
+></DD
+><DT
+>3p</DT
+><DD
+><P
+>&#13;the user always gets prompted for passing
+parameters to the loaded image. No password
+is required.
+</P
+></DD
+></DL
+></DIV
+>
+</P
+></DD
+><DT
+>cmdline</DT
+><DD
+><P
+>&#13;the contents of this entry is appended to the end of tag 129 from the
+DHCP record, provided tag 129 exists.  This feature is unaffected by the
+"p" flags. Passing parameters currently does not make sense for any
+operating system other than Linux and is silently ignored for other
+operating systems. As it is not legal to enter colons as part of an
+entry, you have to escape them by writing "~c" instead. This also means,
+that all tilde characters have to be escaped by writing "~~". As some
+DHCP daemons do not allow for entering a backslash in a character
+string, the escape sequence "~b" inserts a backslash character.
+Currently, all other escape sequences are undefined.
+
+</P
+></DD
+></DL
+></DIV
+>
+</P
+></DD
+></DL
+></DIV
+>
+</P
+><P
+>&#13;(This example has not yet been translated to DHCPD syntax, sorry.)
+For demonstration purposes, I attached an annotated excerpt from my
+"bootptab" illustrating some of these techniques. In the following
+the character sequence <TT
+CLASS="literal"
+>ESC</TT
+> should be replaced by the ASCII
+escape character. Also the 8-bit characters have been changed to 7-bit
+approximations due to SGML tool limitations. To get the original codes,
+use this table: top left corner, char 201 (decimal); horizontal bar,
+char 205; top right corner, char 187; vertical bar, char 186; bottom
+left corner, char 200; bottom right corner, char 188.
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;#
+# The MOTD (message of the day) can contain arbitrary characters, that
+# the PC is capable of displaying.  Here we use 8bit characters for
+# drawing a border around the message; also we change the foreground
+# color to red (this assumes that the BOOT Prom has support for ANSI
+# escape sequences):
+#
+.motd:\
+        :T184="ESC[31m":\
+        :T185="+------------------------------------------------------+":\
+        :T186="| This is an experimental release of the new BOOT-Prom |":\
+        :T187="| code.  It supports a couple of  non-standard  vendor |":\
+        :T188="| extensions.                                          |":\
+        :T189="+------------------------------------------------------+":\
+        :T190="ESC[37m":
+
+#
+# Alternatively, the MOTD can be stored in an external file; this
+# requires that you enabled ANSI support in the BOOT Prom!  For more
+# advanced configurability, you should explore the feature of the
+# patched tftpd daemon (as available in the contrib directory) to
+# execute shell scripts and use the output as the file contents.
+#
+# .motd:\
+#       :T184="ESC[31mLoading message of the day...ESC[37mESC['/etc/motd'#":
+#
+
+#
+# We use the "template" feature of modern versions of "bootp" in order
+# to group common entries. Unfortunately, you cannot use more than one
+# "tc" entry per (pseudo-) host.  Pseudo hostnames should begin with a
+# leading period character.
+#
+# All entries are kept as generic as possible.  This ensures that they
+# will keep working even when the network topology is changed. Leaving
+# the server IP address and the gateway IP address empty, should
+# ensure that booting works even when we go thru "bootpgw" gateways.
+#
+# "Technicolor" special effects are achieved by changing the
+# foreground text color of the individual labels. You could even embed
+# small icons after switching to graphics mode. C.f. "linux-logo.ansi"
+# for an example; this will not work, if your BOOT Prom does not have
+# support for ANSI escape sequences.
+#
+# Passing boot-time parameters to the Linux kernel, requires the
+# password "Penguin".
+#
+# Booting from the local disk requires the password "Joshua". If the
+# BOOT-Prom does not have support for booting from local block devices
+# (floppy, harddrive, ...), then you can either omit the filename
+# (c.f. README.Security for potential security problems) or your TFTP
+# server has to provide a boot image that has been generated by
+# mknbi-blkdev.
+#
+.imagemenu:\
+        :tc=.motd:\
+        :T128=E44574680000:\
+        :T160="timeout=30:default=207:":\
+        :T192="ESC[32mLinux 2.0.27ESC[37m:::/tftpdir/image-linux:99625fa1cac27bb6a2b33b7638afe47:0i1p":\
+        :T193="ESC[33mDOS 6.2ESC[37m:::/tftpdir/image-dos":\
+        :T207="ESC[34mLocal DiskESC[37m:::/dev/hda:85b103482a20682da703aa388933a6d8":
+
+#
+# When using more than a handful of vendor parameters, we have to
+# specify an extension file "ef". If you are very careful, then it is
+# possible to use one extension file for several hosts. Don't forget
+# to run "bootpef" after editing the "bootptab", and make sure that
+# you "chroot" into the proper directory, if applicable.
+#
+.default:\
+        :tc=.imagemenu:\
+        :bf=tftpdir/image-rom:\
+        :hd=:\
+        :ht=ethernet:\
+        :sm=255.255.255.0:\
+        :vm=auto:\
+        :ef=extension.bootp:
+
+#
+# Ideally, hosts differ only with respect to their ethernet hardware
+# ID and IP number. We let the "bootpd" look up the correct IP number.
+#
+thalamus:tc=.default:ha=00400529C11B:ip=thalamus:
+cortex: :tc=.default:ha=0000C0531A24:ip=cortex:
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+Here is an example DHCP specification that uses an external menu
+program.  It also illustrates the use of - in the filename portion of
+the menu options to eliminate needless repetition.
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;# per host setup
+host 192.168.40.203 {
+
+        # MAC and IP addresses
+        hardware ethernet  00:60:08:0d:a9:84;
+        fixed-address 192.168.40.203;
+
+        # default file to boot, common append options, default menu selection and timeout
+        filename "/tftpboot/menu.nb";
+        option option-128 E4:45:74:68:00:00;
+        option option-129 "ramdisk_size=16000 vga=6";
+        option option-160 "timeout=10:default=192";
+        option option-184 "^[['/tftpboot/thinlinux/1.0-alpha-025/motd'#";
+
+        # menu selections, specify filename or "-" to use default filename specified above
+        option option-192 "test1:::-:::nfs=xterm";
+        option option-193 "test2:::-:::nfs=shell";
+        option option-194 "test3:::-:::nfs=other";
+    }
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+</P
+><P
+>&#13;For ISC DHCPD 3.0 Beta 2 Patchlevel 18 and above the syntax above is no
+longer accepted and a new syntax is in operation according to this note
+in the Changelog:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;Use unparsable names for unknown options. WARNING: this will break any
+configuration files that use the option-nnn convention. If you want to
+continue to use this convention for some options, please be sure to
+write a definition, like this:
+
+option option-nnn code nnn = string;
+
+You can use a descriptive name instead of option-nnn if you like.
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x835.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>CONCLUSION</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>&nbsp;</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

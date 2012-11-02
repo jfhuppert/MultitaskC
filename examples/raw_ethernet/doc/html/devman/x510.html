@@ -1,0 +1,181 @@
+<HTML
+><HEAD
+><TITLE
+>Example of a boot image.</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="UP"
+TITLE="Draft Net Boot Image Proposal 0.3, June 15, 1997"
+HREF="tagged.html"><LINK
+REL="PREVIOUS"
+TITLE="Boot prom entry points."
+HREF="x501.html"><LINK
+REL="NEXT"
+TITLE="Terms"
+HREF="x514.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x501.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>A. Draft Net Boot Image Proposal 0.3, June 15, 1997</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x514.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN510"
+></A
+>Example of a boot image.</H1
+><P
+>&#13;Here is an example of how the boot image would look for Linux:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;  0x1B031336,  /* magic number */
+  0x4,         /* length of header is 16 bytes, no vendor info */
+  0x90000000,  /* location in ds:bx format */
+  0x90000200,  /* execute address in cs:ip format */
+
+	       /* 2048 setup.S bytes */
+  0x4,	       /* flags, not end, absolute address, 16 bytes this
+		  record, no vendor info */
+  0x90200,     /* load address - note format */
+  0x800,       /* 4 8 512 byte blocks for linux */
+  0x800,
+
+	       /* kernel image */
+  0x4,	       /* flags, not end, absolute address, 16 bytes this
+		  record, no vendor info */
+  0x10000,     /* load address - note format */
+  0x80000,     /* 512K (this could be shorter */
+  0x80000,
+
+	       /* ramdisk for root file system */
+  0x04000004,  /* flags = last, absolute address, 16 bytes this
+		  record, no vendor info *//
+  0x100000,    /* load address - in extended memory */
+  0x80000,     /* 512K for instance */
+  0x80000,
+	       /* Then follows linux specific information */
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x501.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x514.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Boot prom entry points.</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tagged.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Terms</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

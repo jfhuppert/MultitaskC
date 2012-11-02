@@ -1,0 +1,376 @@
+<HTML
+><HEAD
+><TITLE
+>Troubleshooting tips</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+TITLE="Making an Etherboot EPROM or EEPROM"
+HREF="x225.html"><LINK
+REL="NEXT"
+TITLE="Frequently Answered Questions"
+HREF="x302.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x225.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x302.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN248"
+></A
+>Troubleshooting tips</H1
+><P
+>&#13;
+<P
+></P
+><UL
+><LI
+><P
+>&#13;Floppy boot doesn't work. Is the floppy error-free? Have you
+copied the ROM image (with the disk loader prepended) to the floppy
+raw? Is that size of floppy bootable by your computer? Are you trying to
+run Etherboot on a 16 bit machine (286, 086/088)? Have you selected too
+many compile time options? The real limit on Etherboot is not the size
+of the EPROM but the fact that it executes in the 48kB region between
+0x94000 and 0xA0000. If the sum of code, stack and bss is greater than
+48kB, then Etherboot might crash at unexpected places.
+
+</P
+></LI
+><LI
+><P
+>&#13;Floppy version works but EPROM version doesn't work. There is
+a program called rom-scan (Linux, FreeBSD and DOS versions) in the
+directory contrib/rom-scan which will help detect problems. Rom-scan
+will only work on ISA ROMs though.
+
+</P
+><P
+></P
+><UL
+><LI
+><P
+>&#13;If the EPROM is not detected at all then the contents of
+the EPROM are not visible to the BIOS. Check that you have enabled
+the EPROM with any jumpers or soft configuration settings. Check
+that you do not have any conflicts in the memory address of
+the EPROM and any other hardware.  Perhaps you have to prevent
+it from being mapped out by your BIOS settings. Or perhaps you
+have to shadow it with RAM. Maybe you put the code in the wrong
+half or wrong quarter of the EPROM. Maybe the access time of
+the EPROM is not low enough. You can also use the debug program
+under BIOS to examine the memory area in question.
+
+</P
+></LI
+><LI
+><P
+>&#13;If rom-scan says the EPROM is present but not active,
+then something prevented the BIOS from seeing it as a valid
+extension BIOS. This could be truncation of the EPROM window,
+maybe you have a larger EPROM in a slot meant for a smaller
+one. Maybe there is a checksum error in the EPROM due to
+some bits not properly programmed or the EPROM not being fast
+enough. In one case that we know of, the 3c503 network card,
+the ASIC actually returns 2 bytes of 80 80 in the end locations
+of the EPROM space. This apparently is a kind of signature. The
+makerom program in Etherboot compensates for this, but if the
+pattern is not 80 80, then the code needs to be modified.
+
+</P
+></LI
+><LI
+><P
+>&#13;If rom-scan says the EPROM is present and active, but
+BIOS does not see it, then perhaps the EPROM is located in an
+area that the BIOS does not scan. The range scanned is supposed
+to be 0xC0000 to 0xEF800 in increments of 2kB but I have seen
+some BIOSes that continue the scan into the 0xF0000 page.
+
+</P
+></LI
+></UL
+><P
+>&#13;Note that rom-scan will also detect other extension BIOSes mounted on your
+computer, for example VGA BIOSes and SCSI adapter BIOSes. This is normal.
+
+</P
+><P
+>&#13;For PCI NICs there may be a different reason why the ROM does not work.
+The PCI IDs of the ROM must match those of the NIC controller chip or
+the BIOS will ignore the ROM. The floppy version does not undergo this
+check since it isn't directly called from the BIOS.  You must use the
+ROM image with the correct PCI IDs for your NIC.
+
+</P
+></LI
+><LI
+><P
+>&#13;Etherboot does not detect card. Are you using the right ROM
+image? Is the card properly seated in the computer? Can you see the
+card with other software? Are there any address conflicts with other
+hardware? Is the PCI id of the card one that is not known to Etherboot
+yet? In this case and where you think there is a bug in Etherboot,
+please submit a report to the Etherboot-users mailing list.
+
+</P
+></LI
+><LI
+><P
+>&#13;Etherboot detects card but hangs computer after detection. Some
+cards are booby traps while they are enabled. The typical offenders
+are NE2000s which will hang the bus if any access is made to the reset
+addresses while interrupts are active. You may need to do a hard reset
+of the computer, i.e. power down and up again before running Etherboot.
+
+</P
+></LI
+><LI
+><P
+>&#13;Etherboot detects card but does nothing after saying Searching for
+server. Check your network hardware. Did you select the right hardware
+interface (AUI, BNC, RJ45)? Is the cabling ok? If you have a Unix
+computer on the network and have root privileges, you could run tcpdump
+or ethereal looking for broadcast packets on the bootps port. If the
+requests are getting sent out but no replies are getting back, check
+your DHCPD setup. Also check if the server has a route to the client.
+
+</P
+></LI
+><LI
+><P
+>&#13;Etherboot obtains IP address but fails to load file. Check the tftp
+server. Is the boot image file installed? Is the file world readable? Is
+the path to the file allowed by the configuration of tftpd? Is the
+client denied by tcpwrapper rules?  Did you put the right home directory
+and filename in <TT
+CLASS="filename"
+>/etc/dhcpd.conf</TT
+>? If you are booting
+lots of clients, is inetd shutting down tftpd for being spawned too
+often? If so, you need to get a better inetd or a a dedicated tftpd that
+runs as an independent daemon.
+
+</P
+></LI
+><LI
+><P
+>&#13;Etherboot loads file but hangs halfway through the transfer. We have one
+report that this happens if the Fast A20 Gate option is selected in the
+BIOS setup. The A20 issue is explained <A
+HREF="http://www.win.tue.nl/~aeb/linux/kbd/A20.html"
+TARGET="_top"
+>here</A
+>. In
+effect this causes the loaded kernel to overwrite Etherboot and kill it.
+Try deselecting the option.  You don't need it for Linux anyway.
+
+</P
+></LI
+><LI
+><P
+>&#13;Etherboot loads file via tftp but Linux fails to mount the root
+filesystem, either on an initrd or on NFSroot. This is a large category.
+Here are some suggestions:
+
+<P
+></P
+><UL
+><LI
+><P
+>&#13;You do not have a private copy of the /, /etc, /var, ... directories
+
+</P
+></LI
+><LI
+><P
+>&#13;Your /dev directory is missing entries for /dev/zero and/or
+/dev/null or is sharing device entries from a server that uses
+different major and minor numbers (i.e. a server that is not
+running Linux).
+
+</P
+></LI
+><LI
+><P
+>&#13;Your /lib directory is missing libraries (most notably libc*
+and/or libm*) or does not have the loader files ld*.so*
+
+</P
+></LI
+><LI
+><P
+>&#13;You neglected to run ldconfig to update /etc/ldconfig.cache
+or you do not have a configuration file for ldconfig.
+
+</P
+></LI
+><LI
+><P
+>&#13;Your /etc/inittab and/or /etc/rc.d/* files have not been
+customised for the clients. For example if you set the wrong IP
+address in your client's init files you could interfere with the
+server.
+
+</P
+></LI
+><LI
+><P
+>&#13;Your kernel is missing some crucial compile-time feature (such as NFS
+filesystem support, booting from the net, transname (optional), ELF file
+support, networking support_.
+
+</P
+></LI
+><LI
+><P
+>&#13;Missing init executable (in one of the directories known by the kernel:
+/etc, /sbin, ?). Remember /sbin/init must be a real file, not a symlink.
+
+</P
+></LI
+><LI
+><P
+>&#13;Missing /etc/inittab
+
+</P
+></LI
+><LI
+><P
+>&#13;Missing /dev/tty?
+
+</P
+></LI
+><LI
+><P
+>&#13;Missing /bin/sh
+
+</P
+></LI
+><LI
+><P
+>&#13;System programs that insist on creating/writing to files outside of /var
+(mount and /etc/mtab* is the canonical example)
+
+</P
+></LI
+></UL
+>
+
+The essence is that you must provide whatever is needed in the root
+filesystem that your kernel needs to boot.
+
+</P
+></LI
+></UL
+>
+</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x225.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x302.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Making an Etherboot EPROM or EEPROM</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Frequently Answered Questions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

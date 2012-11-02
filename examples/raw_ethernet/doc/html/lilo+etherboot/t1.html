@@ -1,0 +1,132 @@
+<HTML
+><HEAD
+><TITLE
+>LILO with Etherboot</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="NEXT"
+TITLE="The steps"
+HREF="x13.html"></HEAD
+><BODY
+CLASS="article"
+><DIV
+CLASS="ARTICLE"
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="title"
+><A
+NAME="AEN2"
+></A
+>LILO with Etherboot</H1
+><H3
+CLASS="author"
+><A
+NAME="AEN4"
+>Ken Yap, &#60;ken_yap AT users PERIOD sourceforge PERIOD net&#62;</A
+></H3
+><P
+CLASS="pubdate"
+>10 May 2002<BR></P
+><DIV
+><DIV
+CLASS="abstract"
+><A
+NAME="AEN7"
+></A
+><P
+></P
+><P
+>&#13;This HOWTO explains how to install LILO on disks that do not have any
+Linux filesystems to boot DOS as well as Etherboot .(z)lilo images.
+
+</P
+><P
+></P
+></DIV
+></DIV
+><HR></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN9"
+></A
+>Motivation</H1
+><P
+>&#13;LILO is perhaps the best known Linux boot loader and many people use it
+to single or multiple boot OSes. What is less well known is that LILO
+can also boot from disks that do not have any Linux partitions at all.
+This follows from the design of LILO. The installer stores lists of disk
+blocks to read in and the boot time portion does not care what kind of
+partition the boot images are stored on. All that is needed is a way to
+run the installer on a non-Linux partition. Any filesystem supported by
+Linux can be handled, provided it can be mounted RW. This includes all
+the FAT based DOS and Windows filesystems.
+
+</P
+><P
+>&#13;What I describe below is not actually Etherboot specific. It will work
+just as well if you want to boot a Linux kernel from a DOS partition.
+It just so happens that Etherboot can build images that look like Linux
+kernels to the LILO installer.  Therefore most of the cleverness is in
+getting a LILO installer to run on a non-Linux partition.
+
+</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x13.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>The steps</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<article>
+
+<articleinfo>
+<title>FreeBSD network booting</title>
+<author>
+<firstname>Doug Ambrisko (?)</firstname>
+</author>
+<pubdate>16 October 1999</pubdate>
+
+<abstract>
+
+<para>
+These are some notes on FreeBSD network booting with etherboot.
+</para>
+
+</abstract>
+
+</articleinfo>
+
+<para>
+Add kernel configuration via bootp to kernel.  You can see more options
+in LINT, these are a good set
+</para>
+
+<para>
+
+<programlisting>
+  # Kernel BOOTP support  
+  options         BOOTP           # Use BOOTP to obtain IP address/hostname
+  options         BOOTP_NFSROOT   # NFS mount root filesystem using BOOTP info
+  options         BOOTP_NFSV3     # Use NFS v3 to NFS mount root
+  options         BOOTP_COMPAT    # Workaround for broken bootp daemons.
+</programlisting>
+
+</para>
+
+<para>
+Setup Bootp server or DHCP server, here is an example entry for /etc/bootptab
+refer to the man page bootpd for more information.
+</para>
+
+<para>
+
+<programlisting>
+       .default:\
+             :sm=255.255.255.0:\
+             :gw=your.gateway.ip:\
+             :hn:ht=ether:vm=rfc1048:\
+             :rp="rootfs.ip:/rootfs/path":\
+             :T128="swapfs.ip:/swapfs/path":\
+             :T129=swapsize:\
+             :T130="root,mount,options":\
+             :T131="swap,mount,options":\
+             :ra=255.255.255.255:
+       client01:bf="kernel":ha=00400530d6d9:tc=.default:
+</programlisting>
+
+</para>
+
+<para>
+Enable bootpd in inetd by uncommented the "bootps" line.
+</para>
+
+<para>
+Setup tftpd, copy your kernel into you tftpboot directory.  Note you should
+make the kernel accessible in both the rootfs and the tftpboot area.
+</para>
+
+<para>
+Enable tftpd by uncommenting tftp in /etc/inetd.conf.  If you give the
+full kernel path then remove the /tftpboot directory option in inetd.conf.
+Again for more information look at man tftpd.
+</para>
+
+<para>
+Send a SIGHUP to the inetd process.
+</para>
+
+<para>
+Make sure you export the rootfs, in /etc/exports and SIGHUP mountd if
+needed.  Refer to the man page mountd for more information.
+</para>
+
+<para>
+The swapfile if specified will need to be created.  Just do a "dd" of
+/dev/zero for the size you want into the path specified in the bootptab
+with the IP address appended for example:
+
+<programlisting>
+	/usr/exports/swap/swap.192.168.1.1
+</programlisting>
+
+</para>
+
+<para>
+Now you should be ready to boot diskless.
+</para>
+
+<para>
+Note there are some useful boot time configuration file in /etc/rc.diskless.
+</para>
+
+<para>
+Note2 NFS mount of root was broken in current it has been fixed.
+</para>
+
+</article>

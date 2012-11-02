@@ -1,0 +1,441 @@
+<HTML
+><HEAD
+><TITLE
+>Image Format with Initial Magic Number.</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="UP"
+TITLE="Draft Net Boot Image Proposal 0.3, June 15, 1997"
+HREF="tagged.html"><LINK
+REL="PREVIOUS"
+TITLE="Net Boot Process Description"
+HREF="x433.html"><LINK
+REL="NEXT"
+TITLE="Boot prom entry points."
+HREF="x501.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x433.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>A. Draft Net Boot Image Proposal 0.3, June 15, 1997</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x501.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN456"
+></A
+>Image Format with Initial Magic Number.</H1
+><P
+>&#13;The first 512 bytes of the image file contain the image header,
+and image loading information records. This contains all the
+information needed by the net boot process as to where data
+is to be loaded.
+</P
+><P
+>&#13;The magic number (in time-honoured tradition (well why not?)) is:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;        0 = 36h
+        1 = 13h
+        2 = 03h
+        3 = 1Bh
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+Apart from the two magic numbers, all words and double words are in PC
+native endian.
+</P
+><P
+>&#13;Including the initial magic number the header record is:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;        +---------------------+
+        |                     |
+        | Initial Magic No.   |  4 bytes
+        +---------------------+
+        |                     |
+        | Flags and length    |  double word
+        +---------------------+
+        |                     |
+        | Location Address    |  double word in ds:bx format
+        +---------------------+
+        |                     |
+        | Execute Address     |  double word in cs:ip format
+        +---------------------+
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+The Location address is where to place the 512 bytes. The net boot
+process does this before loading the rest of the image. The location
+address cannot be one of the reserved locations mentioned above, but
+must be an address lower than 100000h.
+</P
+><P
+>&#13;The rest of the image must not overwrite these initial 512 bytes, placed
+at the required location. The writing of data by the net boot process
+into these 512 bytes is deprecated. These 512 bytes must be available for
+the image to interogate once it is loaded and running.
+</P
+><P
+>&#13;The execute address is the location in cs:ip of the initial instruction
+once the full image has been loaded. This must be lower than 100000h,
+since the initial instructions will be executed in 8086 mode. When the
+jump (actually a far call) is made to the boot image, the stack contains a
+far return address, with a far pointer parameter above that, pointing
+to the location of this header.
+</P
+><P
+>&#13;<SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(ky)</I
+></SPAN
+> If bit 31 in the flags is set, then the execute address is
+interpreted as a linear 32-bit address, and a call is made to this
+address. There is no restriction on the range of the execute address.
+The arguments to the routine are: a pointer to an Etherboot specific
+header, a pointer to the tagged image header, and a pointer to the bootp
+reply.  The called routine may return to the boot loader.<SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(ky)</I
+></SPAN
+>
+</P
+><P
+>&#13;The flags and length field is broken up in the following way:
+</P
+><P
+>&#13;Bits 0 to 3 (lowest 4 bits) define the length of the non-vendor header in
+double words. Currently the value is 4.
+</P
+><P
+>&#13;Bits 4 to 7 define the length required by the vendor extra information
+in double words. A value of zero indicates no extra vendor information.
+</P
+><P
+>&#13;<SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(gk)</I
+></SPAN
+>Bit 8 is set if the boot image can return to the net boot
+process after execution. If this bit is not set the boot image does
+never return to the net boot process, and the net boot program has to
+set the system into a clean state before calling the boot
+image.<SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(gk)</I
+></SPAN
+>
+</P
+><P
+>&#13;<SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(ky)</I
+></SPAN
+>Bit 31 is set if the execute address of the boot image is a
+linear 32-bit address to be called. The boot image may return to the
+boot loader.<SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(ky)</I
+></SPAN
+>
+</P
+><P
+>&#13;<SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(gk+ky)</I
+></SPAN
+>Bits 9 to 30 are reserved for future use and must be set to
+zero.<SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(gk+ky)</I
+></SPAN
+>
+</P
+><P
+>&#13;After this header, and any vendor header, come the image loading information
+records. These specify where data is to be loaded, how long it is, and
+communicates to the loaded image what sort of data it is.
+</P
+><P
+>&#13;The format of each image loading information record is :
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;          +---------------------+
+          | Flags, tags and     |  double word
+          | lengths             |
+          +---------------------+
+          |                     |
+          | Load Address        |  double word
+          +---------------------+
+          |                     |
+          | Image Length        |  double word
+          +---------------------+
+          |                     |
+          | Memory Length       |  double word
+          +---------------------+
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+Each image loading information record follows the previous, or the header.
+</P
+><P
+>&#13;The memory length, image length and load address fields are unsigned 32
+numbers. They do not have the segment:offset format used by the 8086.
+</P
+><P
+>&#13;The flags, tags and lengths field is broken up as follows:
+</P
+><P
+>&#13;Bits 0 to 3 (lowest 4 bits) are the length of the non vendor part of this
+header in double words. Currently this value is 4.
+</P
+><P
+>&#13;Bits 4 to 7 indicate the length of any vendor information, in double words.
+</P
+><P
+>&#13;Bits 8 to 15 are for vendor's tags. The vendor tag is a private number that
+the loaded image can use to determine what sort of image is at this particular
+location.
+</P
+><P
+>&#13;Bits 16 to 23 are for future expansion and should be set to zero.
+</P
+><P
+>&#13;Bits 24 to 31 are for flags, which are defined later.
+</P
+><P
+>&#13;Vendors may place further information after this information record, and
+before the next. Each information record may have a different vendor
+length.
+</P
+><P
+>&#13;There are two restrictions on vendor information.
+</P
+><P
+>&#13;One is that the header and all information records that the net boot process
+is to use fall within the first 512 bytes.
+</P
+><P
+>&#13;The second restriction is that the net boot process must ignore all
+vendor additions. The net boot process may not overwrite vendor supplied
+information, or other undefined data in the initial 512 bytes.
+</P
+><P
+>&#13;The flags are used to modify the load address field, and to indicate
+that this is the last information record that the net boot process should
+use.
+</P
+><P
+>&#13;Bit 24 works in conjunction with bit 25 to specify the meaning of the
+load address.
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;  B24    B25
+
+   0     0    load address is an absolute 32 number
+
+   1     0    add the load address to the location one past the last byte
+	      of the memory area required by the last image loaded.
+	      If the first image, then add to 512 plus the location
+	      where the 512 bytes were placed
+
+   0     1    subtract the load address from the one past the
+	      last writeable location in memory. Thus 1 would
+	      be the last location one could write in memory.
+
+   1     1    load address is subtracted from the start of
+	      the last image loaded. If the first image, then
+	      subtract from the start of where the 512 bytes were
+	      placed
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+(For convenience bit 24 is byte 0 of the flag field)
+</P
+><P
+>&#13;Bit 26 is the end marker for the net boot process. It is set when
+this is the last information record the net boot process should
+look at. More records may be present, but the net boot process will not
+look at them. (Vendors can continue information records out past the 512
+boundary for private use in this manner).
+</P
+><P
+>&#13;The image length tells the net boot process how many bytes are to be loaded.
+Zero is a valid value. This can be used to mark memory areas such as
+shared memory for interprocessor communication, flash eproms, data in eproms.
+</P
+><P
+>&#13;The image length can also be different from the memory length. This allows
+decompression programs to fluff up the kernel image. It also allows a file
+system to be larger then the loaded file system image.
+</P
+><P
+>&#13;Bits 27 through 31 are not defined as yet and must be set to zero until
+they are.
+</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x433.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x501.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Net Boot Process Description</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tagged.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Boot prom entry points.</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,208 @@
+<HTML
+><HEAD
+><TITLE
+>Draft Net Boot Image Proposal 0.3, June 15, 1997</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+TITLE="A potted history of Etherboot"
+HREF="x397.html"><LINK
+REL="NEXT"
+TITLE="The target"
+HREF="x427.html"></HEAD
+><BODY
+CLASS="appendix"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x397.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x427.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="appendix"
+><H1
+CLASS="appendix"
+><A
+NAME="tagged"
+></A
+>A. Draft Net Boot Image Proposal 0.3, June 15, 1997</H1
+><P
+>&#13;Jamie Honan and Gero Kuhlmann, gero AT minix PERIOD han PERIOD de
+</P
+><P
+>&#13;In order to provide more functionality to the boot rom code Jamie's
+draft has been changed a little bit. All of Gero Kuhmnann's changes are
+preceded and followed by <SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(gk)</I
+></SPAN
+>. All of Ken Yap's changes are
+preceded and followed by <SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(ky)</I
+></SPAN
+>.
+</P
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN415"
+></A
+>Preamble - the why</H1
+><P
+>&#13;Whilst researching what other boot proms do (at least those implementing
+TCP/IP protocols) it is clear that each 'does their own thing' in
+terms of what they expect in a boot image.
+</P
+><P
+>&#13;If we could all agree on working toward an open standard, O/S suppliers
+and boot rom suppliers can build their products to this norm, and be confident
+that they will work with each other.
+</P
+><P
+>&#13;This is a description of how I will implement the boot rom for
+Linux. I  believe it to be flexible enough for any OS that will be loaded
+when a PC boots from a network in the TCP/IP environment.
+</P
+><P
+>&#13;It would be good if this could be turned into some form of standard.
+</P
+><P
+>&#13;This is very much a first draft. I am inviting comment.
+</P
+><P
+>&#13;The ideas presented here should be independant of any implementation.
+In the end, where there is a conflict between the final of this draft, and an
+implementation, this description should prevail.
+</P
+><P
+>&#13;The terms I use are defined at the end.
+</P
+><P
+>&#13;<SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(gk)</I
+></SPAN
+>IMPORTANT NOTE: The scope of this document starts at the
+point where the net boot process gains control from the BIOS, to where
+the booted image reaches a state from which there is no return to the
+net boot program possible.<SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(gk)</I
+></SPAN
+>
+
+</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x397.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x427.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>A potted history of Etherboot</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>The target</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

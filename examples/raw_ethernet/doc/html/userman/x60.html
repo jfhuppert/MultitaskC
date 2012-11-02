@@ -1,0 +1,315 @@
+<HTML
+><HEAD
+><TITLE
+>Introduction to Etherboot</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+HREF="t1.html"><LINK
+REL="NEXT"
+TITLE="Unpacking, compiling and testing the package"
+HREF="x91.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="t1.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x91.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN60"
+></A
+>Introduction to Etherboot</H1
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN62"
+></A
+>What is Etherboot?</H2
+><P
+>&#13;Etherboot is a software package for creating ROM images that can
+download code over an Ethernet network to be executed on a computer.
+Many network adapters have a socket where a ROM chip can be installed.
+Etherboot is code that can be put in such a ROM. Etherboot can also be
+booted from floppies (mainly for testing purposes but some people have
+been known to use this all the time) and hard disk, as a LILO/SYSLINUX
+compatible image, or from a hard disk partition, or via PXE.
+
+</P
+><P
+>&#13;Etherboot works on the x86, Itanium and Hammer architectures. It has
+not been ported to other platforms yet. Typically the computer is
+diskless and the code is Linux or FreeBSD, but these are not the only
+possibilities.  The code uses the DHCP, tftp and NFS Internet
+Protocols, amongst others.
+
+</P
+><P
+>&#13;For a rather out of date but short talk/tutorial type introduction to
+what Etherboot does, see my <A
+HREF="../diskless/t1.html"
+TARGET="_top"
+>SLUG
+talk</A
+>.
+
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="GPL"
+></A
+>License</H2
+><P
+>&#13;Etherboot is Open Source under the GNU General Public License Version 2
+(GPL2). The license conditions can be obtained from the file COPYING in
+the top directory of the distribution or viewed at <A
+HREF="http://www.gnu.org/"
+TARGET="_top"
+>www.gnu.org</A
+>. In particular note that
+if you are distributing binaries generated from Etherboot, such as ROMs
+or ROM images, you must provide or promise to provide the user with the
+source. If you have not made private changes to the code, you can do
+this by pointing the user to the <A
+HREF="http://www.etherboot.org/"
+TARGET="_top"
+>Etherboot home page</A
+>, noting the release version of course. If
+you have made private changes to the code, then you must distribute
+those changes too with binary distributions.
+
+</P
+><P
+>&#13;The following is not legal advice and you should seek your own legal
+advice but it is a reasonable interpretation of the GPL with respect to
+Etherboot and BIOS code.  Installing Etherboot, either as an extension
+BIOS or combined in the BIOS chip is mere aggregation.  The GPL does
+not extend to other works that a GPLed binary is aggregated with on a
+storage medium. The rationale is this: The BIOS does not need an
+Etherboot ROM to function and the Etherboot ROM can work equally well
+with another BIOS implementation.  Therefore putting Etherboot either on
+a ROM chip or in the same chip as the BIOS does not cause the two to
+become a combined work. Under this interpretation, there is no fear that
+you have to GPL your BIOS if you ship Etherboot with your BIOS.
+
+</P
+><P
+>&#13;The GPL applies to the whole package but a few files may be used under
+other licenses for historical reasons. See <A
+HREF="sourcecopyrights.html"
+>the Section called <I
+>Source copyrights</I
+></A
+> for details.  Please support Open Source by
+joining the community and sharing.  See the <A
+HREF="http://www.etherboot.org/"
+TARGET="_top"
+>Etherboot home page</A
+> for some
+ways you can help Etherboot.
+
+</P
+><P
+>&#13;<SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>No Warranty or Support: Etherboot comes with NO
+warranties of any kind. It is hoped that it will be useful to you, but
+NO responsibility is accepted for any outcome of using it. Etherboot
+also comes with NO support, although you may get helpful advice from the
+mailing lists listed on the Etherboot home page.</I
+></SPAN
+>
+
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN79"
+></A
+>What hardware is supported?</H2
+><P
+>&#13;See Appendix A for a list of supported NICs.  All Etherboot drivers are
+autoprobing, which means they attempt to detect the hardware addresses
+at which the card is installed. It's fairly easy to write a driver if
+you know C and are familiar with Ethernet hardware interfacing. Please
+read the <A
+HREF="../devman/t1.html"
+TARGET="_top"
+>developer manual</A
+> if you
+wish to do so.
+
+</P
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="help"
+></A
+>Getting help</H2
+><P
+>&#13;Please join the <A
+HREF="http://sourceforge.net/projects/etherboot"
+TARGET="_top"
+>Etherboot mailing
+lists</A
+>. These are listed on the Etherboot home page. There is a
+users mailing list and a developers mailing list. The users list is for
+issues with building and running the software, while the developers list
+is for issues with features and coding.
+
+</P
+><P
+>&#13;Please post questions or bug reports to the Etherboot mailing lists,
+please do not mail me, because: 1. you get the benefit of a lot of
+experts seeing your question (no, I don't know everything, if only
+because there are many configurations I have never used); 2. a lot of
+people see the question and answer and this helps them too; 3. I have
+other demands on my time, like a job, and answering individual email is
+an unsustainable practice.  You will probably not get any reply from me
+if you email me directly. I want to make the best use of my time and
+that is by making sure that as many people as possible see the questions
+and answers. Note that I will post my replies to the mailing lists so to
+see the answers you should subscribe, or be willing to check the
+archives later.
+
+</P
+><P
+>&#13;On the other hand, if you have a code or document contribution, then
+email to me is definitely appropriate. Please ask first before you send
+large files. Diffs are preferred to entire archives. If you are really
+keen to volunteer, and have the skills, ask to join the developer team.
+
+</P
+><P
+>&#13;Other lists you can join are the Linux Terminal Server Project mailing
+lists at <A
+HREF="http://www.ltsp.org/"
+TARGET="_top"
+>LTSP</A
+>.  The LTSP list
+is focused more on the LTSP packages. However there is a fair amount of
+overlap between the lists and many key people are on all lists.
+
+</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x91.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Unpacking, compiling and testing the package</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

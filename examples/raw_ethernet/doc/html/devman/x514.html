@@ -1,0 +1,185 @@
+<HTML
+><HEAD
+><TITLE
+>Terms</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="UP"
+TITLE="Draft Net Boot Image Proposal 0.3, June 15, 1997"
+HREF="tagged.html"><LINK
+REL="PREVIOUS"
+TITLE="Example of a boot image."
+HREF="x510.html"><LINK
+REL="NEXT"
+TITLE="References"
+HREF="x525.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x510.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>A. Draft Net Boot Image Proposal 0.3, June 15, 1997</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x525.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN514"
+></A
+>Terms</H1
+><P
+>&#13;When I say 'the net boot process', I mean the act of loading the image
+into memory, setting up any tables, up until the jump to the required
+location in the image.
+
+</P
+><P
+>&#13;The net booting program executes the net boot process. The net boot
+program may be a rom, but not neccassarily. It is a set of instructions
+and data residing on the booting machine.
+
+</P
+><P
+>&#13;The image, or boot image,  consists of the data loaded by the net boot
+process.
+
+</P
+><P
+>&#13;When I say 'the PC boot process', I mean the general PC rom bios boot
+process, the setting up of hardware, the scanning for adaptor roms, the
+execution of adaptor roms, the loading in of the initial boot track. The
+PC boot process will include the net boot process, if one is present.
+
+</P
+><P
+>&#13;When I say client, I mean the PC booting up.
+
+</P
+><P
+>&#13;When I say 'image host', I mean the host where the boot image is comming
+from.  This may not have the same architecture as the client.
+
+</P
+><P
+>&#13;The bootp protocol is defined in RFC951 and RFC1084. The tftp protocol
+is defined in RFC783. These are available on many sites.
+
+</P
+><P
+>&#13;A bootp server is the machine that answers the bootp request. It is not
+neccessarily the image host.
+
+</P
+><P
+>&#13;"Can" and "may" means doesn't have to, but is allowed to and might.
+"Must" means just that. "Cannot" means must not.
+
+</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x510.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x525.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Example of a boot image.</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tagged.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>References</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

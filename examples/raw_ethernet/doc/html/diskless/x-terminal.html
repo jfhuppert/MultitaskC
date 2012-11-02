@@ -1,0 +1,179 @@
+<HTML
+><HEAD
+><TITLE
+>X-terminal</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+TITLE="RH5"
+HREF="x81.html"><LINK
+REL="NEXT"
+TITLE="Other applications"
+HREF="other.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x81.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="other.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="X-terminal"
+></A
+>X-terminal</H1
+><P
+>&#13;The reason I started this. I had a 486DX2/66 left over from an upgrade
+and I wanted to have a quiet X-terminal while the server makes noise
+somewhere else.
+
+</P
+><P
+>&#13;486 or Pentium best. 16 MB should be the minimum. Put in the best video
+card you can get for it. Normal NIC should do.
+
+</P
+><P
+>&#13;On the server, make sure the DC is matched by a clause in
+<TT
+CLASS="filename"
+>/etc/X11/xdm/Xaccess</TT
+> and comment out the
+<TT
+CLASS="filename"
+>:0</TT
+> in <TT
+CLASS="filename"
+>/etc/X11/xdm/Xservers</TT
+>.
+Then make sure that xdm is run from the init scripts.
+
+</P
+><P
+>&#13;On the client, run <TT
+CLASS="filename"
+>X -query</TT
+> <SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>server</I
+></SPAN
+>
+
+</P
+><P
+>&#13;You will get the xdm login box and then all your X clients will run on
+the server.
+
+</P
+><P
+>&#13;I have been using this for several weeks now.
+
+</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x81.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="other.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>RH5</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Other applications</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

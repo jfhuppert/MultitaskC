@@ -1,0 +1,56 @@
+Etherboot 5.4.2
+
+--
+
+It is now possible to specify static boot information instead of
+getting that information from a DHCP server.  This must be done
+carefully, since there is no check for whether the address is unique,
+and could potentially conflict with another network device. See the
+options beginning with STATIC_ in src/Config for more information.
+
+--
+
+A new flag, EXIT_ON_FILE_LOAD_ERROR causes Etherboot to exit if boot
+file loading fails.
+
+--
+
+PXE network booting is supported.  PXE is the most common network
+booting method on x86-based machines, 
+
+Using PXE requires configuring a dhcp server to provide a pxelinux.0 or
+other PXE bootloader, 
+
+For loading Linux, see the PXELINUX home page at:
+
+    http://syslinux.zytor.com/pxe.php
+
+For server setup, an interesting article is here:
+
+   http://wiki.ltsp.org/twiki/bin/view/Ltsp/PXE
+
+--
+
+You must specify an argument to make. Help text is now provided to
+indicate possible make targets.
+
+--
+
+It should be possible to compile Etherboot with gcc >= 3.3.3, including
+gcc 3.4.x now that a couple of bugs have been tracked down. Please mail
+reports of success or failure to the etherboot-users list, together with
+the versions of gcc and binutils used.
+
+gcc 2.x is not supported anymore. You need at least gcc 3.x to compile
+etherboot due to C99 constructs.
+
+--
+
+In order to create .iso and .liso images you need to have the packages
+mtools-3.9.9 or later, and syslinux-2.08 or later installed.  These
+packages are available in various locations and formats.  .liso images
+are like .iso but use floppy emulation.  If you have a very old BIOS
+and .liso images don't work you may wish to try adding the -s option
+of syslinux as a last resort.
+
+--

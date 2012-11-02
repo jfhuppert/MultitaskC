@@ -1,0 +1,1168 @@
+<HTML
+><HEAD
+><TITLE
+>Frequently Answered Questions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+TITLE="Troubleshooting tips"
+HREF="x248.html"><LINK
+REL="NEXT"
+TITLE="Acknowledgements"
+HREF="acknowledgements.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x248.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="acknowledgements.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN302"
+></A
+>Frequently Answered Questions</H1
+><P
+>&#13;Please check this section if you have a problem before asking on the
+mailing lists.
+</P
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN305"
+></A
+>Building Etherboot</H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;What do I need to build Etherboot?
+</P
+><P
+>&#13;You need gcc, gas and binutils, as well as any accompanying libraries and
+include files. Generally speaking on a package based system using RPM or DEB,
+you will need the C compiler package, the include file package, the C library
+package, the assembler package and the binutils package (this may include the
+assembler).  You will also need perl if you modify the file NIC or use a
+different RELOCADDR value in the Makefile than the default, and m4 if you
+modify this file userman.xsgml.
+
+</P
+></LI
+><LI
+><P
+>&#13;I get an error from as saying data32 is an unknown directive or
+it has errors with assembler files.
+
+</P
+><P
+>&#13;Your gas is too old, upgrade to 2.9.5.
+
+</P
+></LI
+><LI
+><P
+>&#13;I get warnings about ljmp *.
+
+</P
+><P
+>&#13;They are harmless, you can ignore these. They are due to changes in the
+assembler syntax between gas versions. We could get rid of the warnings
+if we could easily detect which patches are installed in the version of
+gas you are using (it's not just a matter of detecting the gas version)
+but we'd rather just wait for the old gas versions to disappear since
+they are just warnings.
+
+</P
+></LI
+><LI
+><P
+>&#13;The documentation talks about mkelf-linux and mknbi-dos. Where
+are they?
+
+</P
+><P
+>&#13;These are distributed from the <A
+HREF="http://sourceforge.net/projects/etherboot/"
+TARGET="_top"
+>Etherboot web
+site</A
+>.
+
+</P
+></LI
+><LI
+><P
+>&#13;Why don't you provide prebuilt ROM images?
+
+</P
+><P
+>&#13;<A
+HREF="http://rom-o-matic.net"
+TARGET="_top"
+>rom-o-matic.net</A
+> is the
+answer. This is a site that makes ROM images for you on demand from
+specifications given to a web form and returns the image as the result
+of the form.
+
+</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN325"
+></A
+>Testing Etherboot</H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;I put the ROM image on floppy like you wrote (cat bin/boot1a.bin
+bin/foo.rom &#62; /dev/fd0, or make bin/foo.fd0) but the loader prints
+out an error.
+
+</P
+><P
+>&#13;The floppy you use should be an error-free, preferably a recently
+formatted floppy. Do not trust new floppies; they have been known to
+lose their manufacturer formatting in storage. You don't need to put a
+filesystem of any sort on it, FAT or ext2 or otherwise. Another possible
+cause is that there are alignment differences between the drive used to
+write the floppy and that used on the target machine.
+
+</P
+></LI
+><LI
+><P
+>&#13;My network adapter is detected but I get no reply to the BOOTP/DHCP
+request.
+
+</P
+><P
+>&#13;Do you have a BOOTP or DHCP server running on the same Ethernet segment?
+On many operating systems the server is not enabled by default. Review
+the instructions in the Troubleshooting section. Another thing to note
+is that the BOOTP (or DHCP in fixed address mode) server will not reply
+if it does not know the network adapter's Ethernet address. Since the
+address may be hard to determine if it is not printed on the card or you
+do not have the adapter's setup program, you can copy it from
+Etherboot's startup message. Did you also provide a filename with the
+DHCP offer? Offers with no filenames are ignored by Etherboot.  Remember
+to restart the server if you have edited the config file and the server
+does not automatically reread when it discovers an updated config file.
+
+</P
+><P
+>&#13;Another thing to check is that the BOOTP or DHCP server is allowed to
+receive the query. You may have some protection mechanism such as
+tcpwrappers or a firewall in front of it. As the booting computer does
+not have an IP address, the request will come from 0.0.0.0 so your rules
+must allow through packets from this address.
+
+</P
+><P
+>&#13;If the BOOTP or DHCP server is on another Ethernet segment, things
+get more complicated. You need to run a BOOTP or DHCP relay. You will
+probably also need to set the gateway field in the reply so that TFTP
+will work across the gateway. You should read a good explanation of how
+these work, in say, W. Richard Steven's book TCP/IP Illustrated.
+
+</P
+></LI
+><LI
+><P
+>&#13;Etherboot gets the BOOTP/DHCP parameters but cannot find a
+TFTP server.
+
+</P
+><P
+>&#13;Do you have a TFTP server installed and running and is it allowed to
+serve the client in question? For example the tcpwrapper rules may not
+allow TFTPD to respond to the IP address the booting computer is at. You
+should look at the log files on the server for any clues.
+
+</P
+></LI
+><LI
+><P
+>&#13;The TFTP server is found but it replies Access violation.
+
+</P
+><P
+>&#13;Access violation is a blanket reply for many different problems but
+essentially the TFTP server cannot give Etherboot the file requested. Did
+you put the file where TFTPD expects to find it, e.g. on a directory
+that is on its path? Did you make the file world readable? Case of the
+filename is important too. Check the log files on the TFTP server to see
+what the actual filename it tried to open was, sometimes directory
+prefixes are prepended to the name due to the program options specified.
+
+</P
+></LI
+><LI
+><P
+>&#13;I made this kernel and put it in /tftpdir like you wrote but Etherboot
+says Unable to load file.
+
+</P
+><P
+>&#13;Is the file a boot image? You cannot use a ordinary kernel image, you
+must process it with <A
+HREF="../mknbi.html"
+TARGET="_top"
+>mkelf-linux</A
+>
+first.
+
+</P
+></LI
+><LI
+><P
+>&#13;I have this proprietary boot ROM (e.g. LanWorks, PXE, etc) and I used
+mkelf-linux or mknbi-linux to make a boot image, (or I got this boot
+image from the LTSP project), but the boot ROM doesn't load it, or it
+fails to run.
+
+</P
+><P
+>&#13;The boot image format is specific to Etherboot. It will not work with
+proprietary boot ROMs. You have to find out from the supplier what boot
+procedures you should use. For example, if you are using a LanWorks boot
+ROM, the information you need is <A
+HREF="http://www.3com.com/managedpc"
+TARGET="_top"
+>here</A
+>. For PXE the utility
+you need is PXELINUX.
+
+</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN350"
+></A
+>Hardware capabilities</H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;What network cards are supported?
+</P
+><P
+>&#13;See the list of supported NICs in the Appendix.
+
+</P
+></LI
+><LI
+><P
+>&#13;I have a machine with the X processor and Y megabytes of memory.
+What can I expect to run on it?
+
+</P
+><P
+>&#13;Please note that these estimates are approximate:
+
+</P
+><P
+>&#13;
+<P
+></P
+><UL
+><LI
+><P
+>&#13;On a 386 with at least 4MB of memory you can boot Linux. With 4MB
+perhaps only a few telnet sessions are possible. With 8MB you might be
+able to run a text based web browser like Lynx or W3M. You can also run
+firewalls such as <A
+HREF="http://www.zelow.no/floppyfw/"
+TARGET="_top"
+>floppyfw</A
+>.
+
+</P
+></LI
+><LI
+><P
+>&#13;On a 486 with 16MB of memory you can run X to make an X-terminal.
+
+</P
+></LI
+><LI
+><P
+>&#13;On a Pentium with 32MB of memory you can run an X-terminal and
+some applications locally, say perhaps printing, daemons to control
+devices, etc.
+
+</P
+></LI
+><LI
+><P
+>&#13;On anything faster and with more memory you could perhaps do
+distributed computation, e.g. a cluster.
+
+</P
+></LI
+></UL
+>
+
+</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN370"
+></A
+>Booting Linux</H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;The kernel loads but it cannot find a NFS server for the filesystem.
+
+</P
+><P
+>&#13;Do you have a NFS server running and is it allowed to serve this client?
+NFS is actually several services. On Linux at least you need: nfsd (either
+kernel or userland version), rpc.mountd and portmapper. Check if the
+tcpwrappers config file is allowing portmapper to receive the request.
+Look at the log files for clues. Did we already mention that log files
+are your friends?
+
+</P
+></LI
+><LI
+><P
+>&#13;The filesystem mounts but it says something about not being able to open
+an initial console. Or alternatively, various services complain about
+not being able to write to the filesystem.
+
+</P
+><P
+>&#13;A common mistake in Linux NFS servers is to put extra spaces in
+/etc/exports. Please see <A
+HREF="http://nfs.sourceforge.net/"
+TARGET="_top"
+>the
+NFS FAQ</A
+> for frequently answered questions about Linux NFS
+services.
+
+</P
+><P
+>&#13;Please review the Troubleshooting section for what is required on this
+root filesystem. The situation is complicated by the fact that there are
+many possible ways of setting this up, including using a root filesystem
+that is on ramdisk. If you wish to avoid many of the troubles, try using
+a packaged solution such as <A
+HREF="http://www.ltsp.org/"
+TARGET="_top"
+>LTSP</A
+>.
+
+</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN382"
+></A
+>Running X</H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;I tried to run X on the client but it aborted.
+
+</P
+><P
+>&#13;Remember that the config files used by the X server should pertain to
+the client's video adapter and display hardware. If you used a <A
+HREF="http://www.ltsp.org/"
+TARGET="_top"
+>LTSP</A
+> package, please review the
+configuration directions. If you used the copy files from server
+solution, then you need to customise the X server configuration. Another
+thing that may cause the server to abort is lack of a mouse device.
+
+</P
+></LI
+><LI
+><P
+>&#13;X -query server runs but all I get is a gray stippled screen.
+
+</P
+><P
+>&#13;Either you don't have an XDM server running on the server machine or
+it is not allowed to serve this client. In the latter case check XDM's
+Xaccess file, because for security reasons, the ability for clients to
+connect is usually disabled.
+
+</P
+></LI
+><LI
+><P
+>&#13;When I am logged in using an X-terminal, I find that the floppy
+drive, sound card and name of the computer are those of the server!?
+
+</P
+><P
+>&#13;This is to be expected! This is exactly how an X-terminal works. You
+are indeed logged onto the server and the client just provides
+display (screen) and input device (keyboard and mouse) services to the
+application. This is one of the beauties of the X Windowing system model,
+it's <SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>network transparent</I
+></SPAN
+>.
+
+</P
+></LI
+><LI
+><P
+>&#13;So how do I run applications on the client? I have this (smartcard
+reader, printer, sound card, etc) program that must execute locally.
+
+</P
+><P
+>&#13;The client can be configured to allow you to run programs locally.  What
+you have to do is either start the application from the init scripts run
+during bootup, as would be the case for the printer and sound daemons
+mentioned later; or to start a shell interpreter on the client, either
+through an interactive login to the client or a remote execution of a
+command from the server to the client. Common methods are rsh (insecure)
+and ssh (better).
+
+</P
+></LI
+><LI
+><P
+>&#13;X applications cannot find (some) fonts.
+</P
+><P
+>&#13;Do you have an X font server (XFS) running on the server machine, is it
+allowed to serve this client, and has the client been told to use the
+font server? The last point is usually configured in the XF86Config file,
+or by a xset command to modify the font path after logging in.
+
+</P
+><P
+>&#13;Also note that RedHat (and possibly other distributions) has made XFS
+by default serve only the local machine using a Unix socket.  You need
+to modify the startup script to tell XFS to use a TCP/IP socket.
+
+</P
+></LI
+><LI
+><P
+>&#13;How much CPU power and memory do I need on the client? On the server?
+
+</P
+><P
+>&#13;It depends on the configuration. There are two major cases: where the
+client is an X-terminal, and not much more; and where the client is
+configured to run applications locally.
+
+</P
+><P
+>&#13;An X server will fit in 16MB of memory, and 32MB is quite adequate.
+Performance depends on the CPU, video card and your expectations.
+An old Pentium 200 with a PCI video card does very well, but if you are
+not fussy, a high-end 486 with a VLB video card can be satisfying too.
+
+</P
+><P
+>&#13;If you want to run apps locally, well how long is a piece of string?
+Netscape will need say another 16MB. It all depends. Whatever you do,
+it's worth trimming down on the services you run on the client. Don't
+run more virtual consoles than you need and don't run unneeded daemons.
+
+</P
+><P
+>&#13;As for the server, in the X-terminal case this has all the applications
+running on it, so it should be adequate for the multiuser aspect. A
+high-end Pentium, with 64 MB of memory to start with, and between 8 and
+16MB for each extra client is a good starting point. It will also depend
+on your mix of client access, statistically perhaps not everybody will
+be running at the same time. Remember that you don't have to have one
+big server for all your clients, you can and you should distribute the
+load across servers.
+
+</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN409"
+></A
+>Other client applications</H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;How can I print to a printer attached to a diskless client?
+
+</P
+><P
+>&#13;There is a server program called <A
+HREF="http://www.etherboot.org/p910nd/"
+TARGET="_top"
+>p910nd</A
+> at the Etherboot
+web site that funnels data from a TCP/IP connection to the printer port.
+You can instruct lpd or <A
+HREF="http://www.cups.org/"
+TARGET="_top"
+>CUPS</A
+>
+on the server to send jobs across the network to p910nd.
+
+</P
+></LI
+><LI
+><P
+>&#13;How can I output sound on the client?
+
+</P
+><P
+>&#13;There is a package called <A
+HREF="http://www.solucorp.qc.ca"
+TARGET="_top"
+>virtualfs</A
+> that proxies the sound
+devices across the network. It can also proxy the floppy drive.
+
+</P
+><P
+>&#13;Another solution is <A
+HREF="http://www.tux.org/~ricdude/EsounD.html"
+TARGET="_top"
+>EsounD</A
+>
+
+</P
+><P
+>&#13;You may wish to check the <A
+HREF="http://www.ltsp.org/"
+TARGET="_top"
+>LTSP</A
+>
+site and mailing lists for other proposed solutions.
+
+</P
+></LI
+><LI
+><P
+>&#13;How can I access the floppy on the client?
+
+</P
+><P
+>&#13;Besides virtualfs mentioned above, recent distributions of <A
+HREF="http://wauug.erols.com/pub/knaff/mtools/"
+TARGET="_top"
+>mtools</A
+> have a
+floppyd. This only works with the mtools utilities though.
+
+</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN429"
+></A
+>Booting FreeBSD</H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;Where are the instructions for booting FreeBSD?
+
+</P
+><P
+>&#13;For now, there is just a short document in the doc directory. Better
+versions of this document depend on contributions from the FreeBSD
+community, I am unable to test FreeBSD because I don't run it.
+</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN435"
+></A
+>Booting other operating systems (DOS, Windows)</H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;I want to boot FreeDOS.
+
+</P
+><P
+>&#13;The new mknbi utility supports creating boot images from FreeDOS kernels
+now.  See the <A
+HREF="../mknbi.html"
+TARGET="_top"
+>man page</A
+> for details.
+FreeDOS is under development and if the layout of the kernel image
+changes, please send any corrections to me.
+
+</P
+></LI
+><LI
+><P
+>&#13;I cannot boot DR-DOS 7.03.
+
+</P
+><P
+>&#13;There is some difference between the DR-DOS 7.03 and 7.02 bootblock that
+causes it not to boot. But a 7.02 bootblock works just as well with the
+DR-DOS 7.03 kernel, so you can substitute that.
+
+</P
+></LI
+><LI
+><P
+>&#13;DOS dies when I load HIMEM.SYS.
+
+</P
+><P
+>&#13;Use the /testmem:off option to prevent HIMEM from scribbling over the
+ramdisk which is the floppy A:.
+
+</P
+></LI
+><LI
+><P
+>&#13;How do I make A: my real floppy again after booting is complete?
+
+</P
+><P
+>&#13;Use the rmrd.com program supplied with <A
+HREF="../mknbi.html"
+TARGET="_top"
+>mknbi</A
+>.
+
+</P
+></LI
+><LI
+><P
+>&#13;I want to use the real floppy at the same time I am using the
+ramdisk image of the boot floppy.
+
+</P
+><P
+>&#13;The --harddisk option of mknbi-dos is intended for this. It causes your
+boot drive to be C:, so you can use A: for the real floppy. See the
+<A
+HREF="../mknbi.html"
+TARGET="_top"
+>man page</A
+> for more details
+
+</P
+></LI
+><LI
+><P
+>&#13;I want to boot Windows.
+
+</P
+><P
+>&#13;I pass on this one, as I do not have (by choice) any Windows systems
+running on my computers. Perhaps others can contribute to this
+section. However I gather that it is only possible on Windows95A, as
+other versions don't have the necessary support for diskless booting.
+
+</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN459"
+></A
+>Hardware issues</H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;Where can I get an EPROM made?
+
+</P
+><P
+>&#13;Depending on where you live, you might find a supplier listed on the
+Commercial Links page. Another possibility is to seek the help of
+someone working in a university or industrial lab who has an EPROM
+programmer.  If you are handy with hardware, you could buy a kit or
+build your own.  There are links to kit suppliers in the Commercial
+Links part of the home page.
+
+</P
+><P
+>&#13;Some high end adapters, for example the 3Com and Intel ones, accept
+an EEPROM in the socket. This can be programmed in-situ using utility
+programs, some of which or information about are under the contrib
+directory in the Etherboot distribution.
+
+</P
+><P
+>&#13;Finally some recent motherboard have flash BIOSes which contain
+space where an extension BIOS such as Etherboot can be inserted. The
+Phoenix Award BIOSes can be modified using a program called cbrom.exe
+possibly <A
+HREF="http://www.ping.be/bios"
+TARGET="_top"
+>here</A
+>.  Or do a
+Web search for it. No success has been reported for AMI BIOSes. Dirk von
+Suchodoletz maintains a list of successes and failures <A
+HREF="http://goe.net/anleitungen/award_board.html"
+TARGET="_top"
+>here</A
+>.
+
+</P
+><P
+>&#13;Here is some text contributed by Dirk von Suchodoletz. He hopes to put
+it on a web site someday:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;6.4 Using your mainboard's BIOS to integrate etherboot-code
+
+Newer mainboards that have an AWARD-BIOS can use etherboot without
+separate EPROMS and therefore without the necessity of having a
+EPROM-programmer[?]. (Heinrich Rebehn wishes to add: Flashing the BIOS
+is always a (small) risk. Flashing with unsupported, hacked BIOS image
+is *dangerous* and may render your PC unbootable. If you don't
+have access to a PROM burner you should stay away from experimenting.) In
+order to do this, you need 2 software tools: awdflash.exe, which should be
+included in your mainboard package, and cbrom.exe, which is an OEM-tool
+that allows modifications of the BIOS. awdflash.exe reads and writes
+the flashrom content, whereas cbrom.exe is used to analyse the content
+of the AWARD BIOS image. cbrom.exe can also add code to the BIOS image
+or remove components. This way you can easily integrate etherboot into
+your mainboards without even opening the PC's case.
+
+After the BIOS image has been saved (e.g. as bios.bin), or in case the
+current version of the BIOS has been copied from the board manufacturer's
+website, 'cbrom bios.bin /d' shows how much space is left on the image
+for your code.
+
+As the flashrom holds the compressed BIOS, cbrom will also compress
+the code when adding it to the BIOS. Therefore, 8 to 20 kbyte of free
+memory is needed, depending on the network adapter's driver. In case not
+enough memory is left, unneeded BIOS components can be removed from the
+BIOS image to regain space: the manufacturer's logo or the Symbios/NCR
+SCSI-code are note needed for diskless systems. 'cbrom bios.bin
+/[pci|ncr|logo|isa] release' will remove those unnecessary components.
+
+The command line "cbrom bios.bin /[pci|isa] bootimg.rom [D000:0]" adds
+the compiled etherboot code to the bios. bootimg.rom is the code we
+would use to burn onto EEPROMs in other cases. Depending on your network
+card, either the pci or isa options have to be used. With isa cards
+you have to tell cbrom to which RAM location the code will be extracted
+at boot time. Attention: Compile the etherboot with the -DASK_BOOT or
+-DEMERGENCYDISKBOOT option to be able to access a disk. The code added
+by cbrom will be executed before the computer seeks for a boot disk
+or floppy.
+
+6.5 Booting with a DOS executable (COM) file
+
+If the computer has to be used with more than one operating systems,
+for example using the computer as an X-Terminal in addition to the
+already installed NT on the harddrive, etherboot has to be used with
+the compile-time option -DASK_BOOT. In case hardware-conflicts between
+Windows NT and the installed EPROM exist, creating DOS Executables
+(e.g. using 'make rtl8139.com') can provide a useful remedy. Those DOS
+Executables are comparable in their functionality to .rom images and
+can be used as substitutes.
+
+In case an existing DOS-bootsector, stored in BOOTSECT.DOS, cannot be
+used, creating one has to be done by formatting and installing a harddrive
+using DOS before installing NT (see Win-NT Multiboot-HOWTO). In addition
+the DOS system files are needed (IO.SYS, MSDOS.SYS, or KERNEL.SYS
+when using FreeDOS) and have to be copied into the directory of the
+NT loader. If using Autoexec.bat to start the .COM file is desired,
+either the particular COMMAND.COM has to be provided or the etherboot
+file needs to be renamed as COMMAND.COM. This file will then be started
+instead of the DOS-Shell which is useful for avoiding unwanted user
+interaction. Afterwards a line has to be added to BOOT.INI as if DOS
+was to be booted:
+
+[boot loader]
+timeout=20
+default=C:\bootsect.dos #add this line if dhcp/tftp should be default action
+[operating systems]
+multi(0)disk(0)rdisk(0)partition(2)\WINNT="Windows NT Workstation, Version 4.0"
+[VGA-Modus]" /basevideo /sos
+C:\bootsect.dos="DHCP/TFTP (Linux diskless via etherboot)" #our boot option
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+And here are some comments by Rapp Informatik Systeme GmbH about
+cbrom.exe versions:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;Some more remarks for cbrom..
+
+There are several version numbers of cbrom.exe p.e. 1.x and 2.x.
+and there is a cbrom called cbrom6.exe. First cbrom.exe with Version
+1.x (newest 1.32) is for Award Bios Version 4.5x  and cbrom6.exe is
+for Award Bios Version 6.xx.
+
+So because it seems a lot people become confused and use cbrom 1.x
+for the new 6.x Bios Award merged this together to a cbrom.exe  with
+Version number 2.x ( newest know 2.04) witch now runs on Award 4.5x and
+6.xx Bioses.
+
+Now how to find cbrom.exe. Different 1.x Versions of cbrom.exe
+could be found on the net, cbrom6.exe seems to be gone. It seems
+that Award/Phoenix do all that cbrom is deleted from servers of board
+manufactures. So cbrom.exe Vers 2.04 is not available on the net.
+If somebody need this please try to send a demand question to the list -
+I hope somebody will mail it to you.
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+</P
+></LI
+><LI
+><P
+>&#13;How do I enable the ROM socket on my network adapter? There are
+no jumpers on the card.
+
+</P
+><P
+>&#13;These jumperless cards need a card-specific utility program to enable
+the ROM.  Normally the manufacturer supplies it on a diskette or CDROM.
+You lost the diskette? If you know the manufacturer, you might be able
+to get the program from their website. You have a mystery card? Well the
+first thing to do is to identify the card. If it is an ISA card and made
+in Taiwan or China it's almost certainly a NE2000 clone. For some
+information, try <A
+HREF="http://www.geocities.com/ken_yap_aus/"
+TARGET="_top"
+>here</A
+>. If it's a PCI
+card, then either the BIOS or the
+<A
+HREF="http://atrey.karlin.mff.cuni.cz/~mj/pciutils.shtml"
+TARGET="_top"
+>Linux PCI
+Utilities</A
+> should be able to tell you the manufacturer and device
+IDs, which you can then look up to convert to names.
+
+</P
+></LI
+><LI
+><P
+>&#13;I would like to boot my laptop diskless from a floppy containing
+Etherboot.
+
+</P
+><P
+>&#13;The problem is that laptops these days use PCMCIA network adapter cards.
+These in turn connect to the PCMCIA controller when docked. To be able to
+communicate with the PCMCIA card, Etherboot would first have to talk
+to the PCMCIA controller. Until somebody writes the code to do this...
+Booting from disk is different because the kernel will load the PCMCIA
+controller code from disk first. You could always put a Linux kernel on
+the boot floppy.
+
+</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN480"
+></A
+>Drivers</H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;There is no Etherboot driver for my network adapter. Can you write
+me one?
+
+</P
+><P
+>&#13;If I were independently wealthy and had nothing else to do in life, sure!
+But unfortunately I have a day job and Etherboot is a hobby. A couple
+of the drivers were written for pay and the others were written by
+volunteers. Perhaps you might like to volunteer?  If you have a good
+grasp of C, and understand basic hardware concepts, it is quite doable,
+and not nearly as difficult as writing a Linux device driver.  See the
+<A
+HREF="../devman/t1.html"
+TARGET="_top"
+>developer manual</A
+>. You will have the
+reward of understanding hardware intimately and seeing your work benefit
+users worldwide.
+
+</P
+><P
+>&#13;If you are a commercial entity, you might consider assigning staff or
+hiring a volunteer to write the driver. You get the benefit of the rest
+of the Etherboot code infrastructure and users worldwide get to
+appreciate your contribution.  Bear in mind license conditions detailed
+in <A
+HREF="x60.html#GPL"
+>the Section called <I
+>License</I
+></A
+>, of course.  NIC manufacturers note, this may
+be one way to attract users to your hardware products. NIC users note,
+petition your NIC manufacturer to support Etherboot.
+
+</P
+></LI
+><LI
+><P
+>&#13;I see that my network adapter is supported in Linux but not in
+Etherboot. Can I use the Linux driver in Etherboot? Or maybe you can
+adapt the Linux source for me. I can send you the Linux driver source if
+you just say the word.
+
+</P
+><P
+>&#13;No, the structure of Linux and Etherboot drivers are rather different.
+There are several reasons: Linux drivers are more complicated and written
+to give good performance, whereas Etherboot drivers are written to be
+simple. Linux drivers are interrupt driven, whereas Etherboot drivers
+are polling. Linux drivers have an elaborate support structure, whereas
+Etherboot drivers are fairly self-standing.
+
+</P
+><P
+>&#13;But... you can use Linux drivers as a source of reverse-engineering
+information. Several of the drivers in Etherboot were adapted from Linux
+drivers. But don't send me the driver source; see previous FAQ about
+volunteering. And I have the latest Linux source anyway, doesn't
+everyone?
+
+</P
+></LI
+></OL
+></DIV
+><DIV
+CLASS="sect2"
+><H2
+CLASS="sect2"
+><A
+NAME="AEN493"
+></A
+>Miscellaneous</H2
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;I don't understand something, or I have a question not covered by
+this list.
+
+</P
+><P
+>&#13;Please see <A
+HREF="x60.html#help"
+>the Section called <I
+>Getting help</I
+></A
+> earlier in this document.
+
+</P
+></LI
+></OL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x248.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="acknowledgements.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Troubleshooting tips</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Acknowledgements</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

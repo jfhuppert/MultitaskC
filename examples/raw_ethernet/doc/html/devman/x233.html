@@ -1,0 +1,412 @@
+<HTML
+><HEAD
+><TITLE
+>The development environment of Etherboot</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+TITLE="The architecture of Etherboot"
+HREF="x169.html"><LINK
+REL="NEXT"
+TITLE="Frequently asked questions"
+HREF="x295.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x169.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x295.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN233"
+></A
+>The development environment of Etherboot</H1
+><P
+>&#13;Etherboot is written in C, with certain routines written in x86
+assembler for access to machine resources or to do things not possible
+in C. The tools used are the GNU C compiler and GNU x86 assembler.
+<B
+CLASS="command"
+>ld</B
+> is used to link the object files.  An auxiliary
+program called <B
+CLASS="command"
+>makerom.pl</B
+> converts this binary into a
+form suitable for writing into a ROM.
+
+</P
+><P
+>&#13;A Makefile coordinates all the building procedures. However there are
+many network adapters that differ only in the PCI vendor and device IDs.
+This information must be programmed into the ROM header using
+<B
+CLASS="command"
+>makerom</B
+>.  An auxiliary script called
+<B
+CLASS="command"
+>genrules.pl</B
+> scans all driver source files for the
+device names and IDs and outputs make rules to a file called
+<TT
+CLASS="filename"
+>Roms</TT
+> that is included by the main Makefile to
+generate all the ROM images.  Another file included by Makefile is
+<TT
+CLASS="filename"
+>Config</TT
+>, which contains user configurable build
+parameters.
+
+</P
+><P
+>&#13;Let us take an example of a ROM image that we could build,
+<TT
+CLASS="filename"
+>bin/mx98715.zrom</TT
+>. According to this line in the
+file <TT
+CLASS="filename"
+>tulip.c</TT
+>:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;PCI_ROM(0x10d9, 0x0531, "mx98715", "Macronix MX987x5"),
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+the driver code is in <TT
+CLASS="filename"
+>tulip.c</TT
+> and the vendor ID is
+0x10d9 and the device ID is 0x0531. If one were to say <B
+CLASS="command"
+>make
+bin/mx98715.zrom</B
+>, the following actions happen:
+
+</P
+><P
+>&#13;
+<P
+></P
+><UL
+><LI
+><P
+>&#13;Any needed utilities such as <TT
+CLASS="filename"
+>bin/nrv2b</TT
+> are
+built.
+
+</P
+></LI
+><LI
+><P
+>&#13;<TT
+CLASS="filename"
+>drivers/net/tulip.c</TT
+> is compiled to
+<TT
+CLASS="filename"
+>bin/tulip.o</TT
+>.
+
+</P
+></LI
+><LI
+><P
+>&#13;The startup routine, <TT
+CLASS="filename"
+>arch/i386/core/start32.S</TT
+> is
+assembled to <TT
+CLASS="filename"
+>bin/start32.o</TT
+>.
+
+</P
+></LI
+><LI
+><P
+>&#13;All the core Etherboot files, e.g. <TT
+CLASS="filename"
+>core/main.c</TT
+>,
+<TT
+CLASS="filename"
+>osloader.c</TT
+>, etc, are compiled to corresponding
+object files in <TT
+CLASS="filename"
+>bin/*.o</TT
+> and combined into an ar
+archive, <TT
+CLASS="filename"
+>bin/bootlib.a</TT
+>, for convenience.
+
+</P
+></LI
+><LI
+><P
+>&#13;The startup routine (which must be first in the list of objects), the
+driver object, <TT
+CLASS="filename"
+>bootlib.a</TT
+>, the platform specific
+objects are linked to produce an ELF binary, linked to run at the
+relocation address of Etherboot, currently 0x20000.  The ELF binary is
+converted to an Etherboot binary using GNU utilities. This binary is
+can be on non-x86 platforms by conversions. (To fill in later.) For the
+x86 platform, we need to prepend loaders for the chosen load method.
+
+</P
+></LI
+><LI
+><P
+>&#13;The prepended ROM loaders, rloader, and prloader, are produced by
+assembling <TT
+CLASS="filename"
+>arch/i386/prefix/loader.S</TT
+> with different
+defines. The meaning of the prefixes are: rloader = basic ROM loader,
+and prloader = PCI header basic ROM loader.  The loaders contain the
+needed headers for the BIOS to recognise the code as an extension ROM.
+See <A
+HREF="extension.html"
+>the Section called <I
+>The execution environment of Etherboot</I
+></A
+> on the extension BIOS mechanism.
+
+</P
+></LI
+><LI
+><P
+>&#13;For example, in the case of <TT
+CLASS="filename"
+>bin/mx987x5.zrom</TT
+>, this
+is for a PCI adaptor and we want a compressed ROM, so the loader is
+prloader.  This is prepended to the Etherboot image to generate a ROM
+image.
+
+</P
+></LI
+><LI
+><P
+>&#13;<B
+CLASS="command"
+>makerom.pl</B
+> is run over this ROM image to pad it to
+the size of a standard EPROM. (8 kB, 16 kB, 32 kB, etc.) The PCI IDs are
+written into the image into the PnP structure at the right spots. A
+string identifying the device and Etherboot version is written into the
+unprogrammed bytes at the end of the ROM image, if space is available,
+and a pointer to that written into the PnP structure. The vendor string
+and the device string are normally printed by the PCI PnP BIOS at boot
+time. Makerom also calculates the checksum (both for the PnP structure,
+if present and for the whole image) and alters designated spare bytes in
+the image so that the checksums come out right.  The image is then ready
+to be written into an EPROM.
+
+</P
+></LI
+><LI
+><P
+>&#13;By prepending alternate loaders to the Etherboot image, we can load the
+image from floppy, LILO/SYSLINUX, PXE or DOS.  In the case of floppy
+loading, the preloader is called <TT
+CLASS="filename"
+>floppyload.bin</TT
+>. It
+is one sector (512 bytes) long and loaded from the floppy, starting at
+the beginning of the floppy. It then loads the blocks following itself,
+which it assumes to be an Etherboot image, into memory, then jumps to
+the start of it.
+
+</P
+><P
+>&#13;In the case of LILO/SYSLINUX booting, the preloader is
+<TT
+CLASS="filename"
+>bin/liloprefix.bin</TT
+>. It contains what looks like a
+floppy sector and a startup segment to LILO/SYSLINUX and makes
+LILO/SYSLINUX "think" that this is a Linux kernel.
+
+</P
+></LI
+><LI
+><P
+>&#13;The loader for chaining from PXE is in
+<TT
+CLASS="filename"
+>bin/pxeprefix.bin</TT
+>, and when prepended to an image,
+produces a file that can be downloaded and executed by a PXE conforming
+boot rom as a first stage loader. Etherboot then takes over the
+remainder of the load process.
+
+</P
+></LI
+><LI
+><P
+>&#13;Yet another preloader is not for a device but for an OS environment.
+This is <TT
+CLASS="filename"
+>bin/comprefix.bin</TT
+>, and when prepended to an
+image, makes it look like a DOS .com executable, including the
+peculiarity of starting at COM_SEGMENT:0x100. All it does however is
+jump to the Etherboot image.
+
+</P
+></LI
+><LI
+><P
+>&#13;All the preceeding special preloaders have associated Makefile rules and
+are created by asking for images with the appropriate suffix.  For
+example, if one wanted an image for writing onto a floppy one would say:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;make bin/mx98715.zdsk
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+</P
+></LI
+></UL
+>
+
+</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x169.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x295.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>The architecture of Etherboot</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Frequently asked questions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

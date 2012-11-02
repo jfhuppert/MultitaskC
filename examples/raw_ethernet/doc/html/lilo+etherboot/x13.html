@@ -1,0 +1,327 @@
+<HTML
+><HEAD
+><TITLE
+>The steps</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="PREVIOUS"
+HREF="t1.html"><LINK
+REL="NEXT"
+TITLE="Notes"
+HREF="x52.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="t1.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x52.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN13"
+></A
+>The steps</H1
+><P
+>&#13;
+<P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>&#13;Get hold of a rescue floppy like tomsbtrt (www.toms.net). Other
+rescue floppies or CDs should work also. All you have to be able to do
+with the rescue disk is mount a DOS/Windows filesystem on the Linux
+filesystem.
+
+</P
+><P
+>&#13;The next 4 steps are done on a host Linux system.
+</P
+></LI
+><LI
+><P
+>&#13;Get hold of a recent LILO distribution. I used lilo-21.7-5. Edit the
+Makefile to generate a statically linked lilo executable by adding
+--static to the link command. Do a make. This will generate a lilo
+executable. You might want to run strip on this to reduce the size. Also
+generated will be various boot programs ending in .b.
+
+</P
+></LI
+><LI
+><P
+>&#13;Create a working directory, say /tmp/lilo and under it mkdir boot/,
+sbin/ and etc/.
+
+</P
+></LI
+><LI
+><P
+>&#13;Copy the .b files to /tmp/lilo/boot.  cp -p /tmp/lilo/boot-menu.b
+/tmp/lilo/boot.b. You can also substitute -text for -menu if you prefer
+a plain text prompt. Copy the lilo executable to /tmp/lilo/sbin.  Create
+/tmp/lilo/etc/lilo.con and add an entry for DOS.  Add entries to
+/tmp/lilo/etc/lilo.con for the Etherboot images.
+
+</P
+></LI
+><LI
+><P
+>&#13;Generate the Etherboot .zlilo or .lilo images you want and copy
+them to /tmp/lilo/boot.  Remember to alter the names to 8.3 standard as
+necessary.
+
+</P
+></LI
+><LI
+><P
+>&#13;In /tmp/lilo, zip the contents to say /tmp/lilo.zip. Use a floppy or
+other means to transfer this to the DOS system. To save you work, you
+can find a copy of this zip archive, minus the Etherboot images and the
+lilo.con modifications, <A
+HREF="http://etherboot.sourceforge.net/lilo2175.zip"
+TARGET="_top"
+>here</A
+>.
+
+</P
+></LI
+><LI
+><P
+>&#13;Alternatively pack the archive with tar and gzip. This will allow
+you to transfer this to the DOS system using the wget on the rescue
+floppy, see below.
+
+</P
+></LI
+><LI
+><P
+>&#13;Unpack the archive in the root directory of the DOS system. If you
+are using pkunzip, remember to use the option that preserves the paths.
+You should end up with three new top level directories: \boot, \sbin and
+\etc.
+
+</P
+></LI
+><LI
+><P
+>&#13;Reboot the DOS system using the rescue floppy. Mount the DOS
+filesystem, say on /mnt.
+
+</P
+></LI
+><LI
+><P
+>&#13;Make a symlink from /mnt/boot to /boot. You can't use the -r /mnt
+option of lilo because it will chroot to /mnt and look for /mnt/dev/hda,
+and of course those device files don't exist on a DOS FS.
+
+</P
+></LI
+><LI
+><P
+>&#13;Run /mnt/sbin/lilo -v -C /mnt/etc/lilo.con This will write LILO into
+the master boot sector.
+
+</P
+></LI
+><LI
+><P
+>&#13;Umount /mnt and reboot. Keep the rescue floppy around for future
+modifications to \etc\lilo.con.
+
+</P
+></LI
+><LI
+><P
+>&#13;If you made a .tar.gz package instead of a .zip package, then you
+can streamline all of the above with a couple of commands if you have a
+web server handy and you can put a shell script and the .tar.gz package
+there. Once you have booted tomsrtbt, issue a wget for the install shell
+script, something like this:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;	wget http://172.16.2.25/thin/install.sh
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+install.sh contains:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;#!/bin/sh
+mount -t msdos /dev/hda1 /mnt
+(cd /mnt; wget -O - http://172.16.2.25/thin/lilo2175.tar.gz | gunzip | tar xf - 2&#62;/dev/null)
+rm -f /boot
+ln -s /mnt/boot /boot
+/mnt/sbin/lilo -v -C /mnt/etc/lilo.con
+umount /mnt
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+Run it with:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;	sh install.sh
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+</P
+></LI
+><LI
+><P
+>&#13;Advanced: If you have several types of network cards on your
+network, you could provide different install scripts for them which
+would fetch different images. Or you could parameterise install.sh.
+Of if you are really cunning, you could try to extract the network card
+identity out of a lsmod, as tomsrtbt autoprobes for several common NICs.
+
+</P
+></LI
+><LI
+><P
+>&#13;LILO should take control on boot up and there should be entries for
+DOS and each Etherboot image. You can even have fancy splash graphics,
+this is a LILO enhancement in some distributions like SuSE.
+
+</P
+></LI
+></OL
+>
+</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x52.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Notes</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

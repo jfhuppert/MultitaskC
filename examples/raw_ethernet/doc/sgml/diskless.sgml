@@ -1,0 +1,287 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+
+<article>
+
+<articleinfo>
+<title>SLUG talk: Setting up a diskless Linux system</title>
+<author>
+<firstname>Ken Yap</firstname>
+</author>
+<pubdate>30th January 1998</pubdate>
+</articleinfo>
+
+<sect1 id="Why">
+<title>Why network booting?</title>
+
+<para>
+
+<itemizedlist>
+<listitem>
+
+<para>
+No moving parts, less noise and power consumption
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+Centralised administration
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+No tampering
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+Standalone applications
+
+</para>
+</listitem>
+
+</itemizedlist>
+</para>
+</sect1>
+
+<sect1 id="How">
+<title>How does it work?</title>
+
+<para>
+
+<orderedlist>
+<listitem>
+
+<para>
+Diskless computer (DC) broadcasts MAC address with bootp: Who am I?
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+DHCP server on S looks up DB: Your IP address is X.X.X.X, your server is
+S, your boot file is <filename>vmlinuz.myname</filename>, etc.
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+DC asks to load file from TFTP server on S: Please give me
+<filename>vmlinuz.myname</filename>
+
+</para>
+</listitem>
+<listitem>
+<para>
+S: Here you are (<filename>/tftpdir/vmlinuz.myname</filename>)
+
+</para>
+<para>
+DC thinks a while (booting Linux).
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+DC: Please let me mount <filename>/</filename> with NFS
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+DC: Please let me mount other NFSes (<filename>/usr, /home/</filename>, etc)
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+S: Here you are
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+DC: Runs intended application
+
+</para>
+</listitem>
+</orderedlist>
+</para>
+
+<para>
+Network boot ROM contains code to do 1 and 3.
+
+</para>
+</sect1>
+
+<sect1 id="Server">
+<title>Server setup</title>
+
+<sect2>
+<title>Bootpd setup</title>
+
+<para>
+
+<itemizedlist>
+<listitem>
+
+<para>
+(In 2003: DHCPD is preferred.)  Install bootpd
+
+</para>
+</listitem>
+<listitem>
+
+<para>
+Edit <filename>/etc/bootptab</filename>, typical line
+
+</para>
+</listitem>
+
+</itemizedlist>
+
+</para>
+<para>
+
+<programlisting>
+xterm.ken.net.au:tc=.default:ht=ethernet:ha=08002BB7F380:\
+	ip=192.168.0.100:bf=vmlinuz.xterm
+</programlisting>
+
+</para>
+</sect2>
+
+<sect2>
+<title>Tftpd setup</title>
+
+<para>
+
+<itemizedlist>
+<listitem>
+
+<para>
+Install tftpd, make sure it's active in
+<filename>/etc/inetd.conf</filename>, typical line
+
+</para>
+</listitem>
+</itemizedlist>
+</para>
+
+<para>
+
+<programlisting>
+tftp dgram udp wait root /usr/sbin/tcpd in.tftpd /tftpdir
+</programlisting>
+</para>
+</sect2>
+
+<sect2>
+<title>Kernel image</title>
+
+<para>
+(In 2003: The preferred method is to download along with the kernel
+a ramdisk that sets up a initial root filesystem, which is then used
+to mount the real root filesystem.  www.ltsp.org does it this way.)
+
+</para>
+<para>
+After building the kernel and ramdisk, run
+<filename>mkelf-linux</filename> from the Etherboot distribution on it.
+Install this <emphasis>boot image</emphasis> as
+<filename>/tftpdir/</filename><replaceable>&lt;bf attribute in
+bootptab&gt;</replaceable>.
+
+</para>
+</sect2>
+</sect1>
+
+<sect1 id="Netloader">
+<title>Net loader</title>
+
+<para>
+A small program that runs as a BIOS extension, usually on an EPROM on
+the NIC. It handles the BOOTP query and TFTP loading and then transfers
+control to the loaded image.
+
+</para>
+<para>
+It uses UDP/IP protocols but the loaded image doesn't have to be Linux.
+The loaded image can be anything, even DOG.
+
+</para>
+<para>
+It can also be loaded from a floppy for testing and for temporary
+setups.
+
+</para>
+</sect1>
+
+<sect1>
+<title>RH5</title>
+
+<para>
+(In 2003: Details of RH5 setup too old to recommend and therefore
+removed.)
+
+</para>
+</sect1>
+
+<sect1 id="X-terminal">
+<title>X-terminal</title>
+
+<para>
+The reason I started this. I had a 486DX2/66 left over from an upgrade
+and I wanted to have a quiet X-terminal while the server makes noise
+somewhere else.
+
+</para>
+<para>
+486 or Pentium best. 16 MB should be the minimum. Put in the best video
+card you can get for it. Normal NIC should do.
+
+</para>
+<para>
+On the server, make sure the DC is matched by a clause in
+<filename>/etc/X11/xdm/Xaccess</filename> and comment out the
+<filename>:0</filename> in <filename>/etc/X11/xdm/Xservers</filename>.
+Then make sure that xdm is run from the init scripts.
+
+</para>
+<para>
+On the client, run <filename>X -query</filename> <emphasis remap="it">server</emphasis>
+
+</para>
+<para>
+You will get the xdm login box and then all your X clients will run on
+the server.
+
+</para>
+<para>
+I have been using this for several weeks now.
+
+</para>
+</sect1>
+
+<sect1 id="Other">
+<title>Other applications</title>
+
+<para>
+You could netboot routers, print servers (but should not be spooling
+print server), standalone apps, etc.
+
+</para>
+</sect1>
+</article>

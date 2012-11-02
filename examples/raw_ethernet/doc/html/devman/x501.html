@@ -1,0 +1,213 @@
+<HTML
+><HEAD
+><TITLE
+>Boot prom entry points.</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.7"><LINK
+REL="HOME"
+HREF="t1.html"><LINK
+REL="UP"
+TITLE="Draft Net Boot Image Proposal 0.3, June 15, 1997"
+HREF="tagged.html"><LINK
+REL="PREVIOUS"
+TITLE="Image Format with Initial Magic Number."
+HREF="x456.html"><LINK
+REL="NEXT"
+TITLE="Example of a boot image."
+HREF="x510.html"></HEAD
+><BODY
+CLASS="sect1"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+></TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x456.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>A. Draft Net Boot Image Proposal 0.3, June 15, 1997</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x510.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="sect1"
+><H1
+CLASS="sect1"
+><A
+NAME="AEN501"
+></A
+>Boot prom entry points.</H1
+><P
+>&#13;<SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(gk)</I
+></SPAN
+>As mentioned above the net boot process has to provide
+interrupt 78h as an entry point in case, the returnable flag (bit 9 of
+the flags field in the image header) of the boot image has been set.
+When calling this interface interrupt, the caller has to load the AH
+register with a value indicating the type of operation requested:
+
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="programlisting"
+>&#13;00h  -  Installation check
+       Input:  none
+       Output: AX  -  returns the value 474Bh
+	       BX  -  flags indicating what further services are
+		      provided by the net boot program:
+		       Bit 0 - packet driver interface (see below)
+		       Bits 1 to 15 are unused and have to be zero
+
+01h  -  Cleanup and terminate the boot process services. This will
+       also remove the services provided by interrupt 87h.
+       Input:  none
+       Output: none
+</PRE
+></TD
+></TR
+></TABLE
+>
+
+Further functions are not yet defined. These functions are only available
+to boot images which have the first magic number at the beginning of the
+image header, and have the returnable flag set in the flags field.
+</P
+><P
+>&#13;In order to provide compatibility with net boot programs written to match
+an earlier version of this document, the loaded image should check for the
+existence of interrupt 78h by looking at it's vector. If that's 0:0, or if
+it does not return a proper magic ID after calling the installation check
+function, the boot image has to assume that the net boot program does not
+support this services interrupt.
+</P
+><P
+>&#13;If the bit 0 of register BX of function 00h is set, the boot program has
+to provide a <A
+HREF="http://www.crynwr.com"
+TARGET="_top"
+>packet driver</A
+>
+interface at interrupt 79h as described in the packet driver interface
+standard, version 1.09, published by FTP Software, Inc., which is not
+repeated here. It serves as an interface to the system's network card.
+It is important to note that the net boot process has to provide a clean
+packet driver interface without any handles being defined when the boot
+image gets started. It is expected that the boot image sets up it's own
+TCP/IP or other network's stack on top of this packet driver interface.
+When the boot image returns to the net boot process, it has to return a
+clean packet driver interface as well, without any handles being
+defined.<SPAN
+CLASS="emphasis"
+><I
+CLASS="emphasis"
+>(gk)</I
+></SPAN
+>
+
+</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x456.html"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x510.html"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Image Format with Initial Magic Number.</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="tagged.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Example of a boot image.</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>
