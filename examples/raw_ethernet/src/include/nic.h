@@ -40,6 +40,7 @@ struct nic
 
 extern struct nic nic;
 extern int  eth_probe(struct dev *dev);
+extern int  eth_probe2(void);
 extern int  eth_poll(int retrieve);
 extern void eth_transmit(const char *d, unsigned int t, unsigned int s, const void *p);
 extern void eth_disable(void);

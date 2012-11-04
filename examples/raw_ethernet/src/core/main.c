@@ -28,8 +28,6 @@ char as_main_program = 1;
 
 static const char broadcast[]={0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
 
-static struct dev eth_dev;
-
 /*------------------------------------------------------------------------------*/
 /* in_call(): the entry point to Etherboot.  Generally called from
  * arch_in_call(), which in turn will have been invoked from
@@ -114,8 +112,7 @@ unsigned long eth_data;
 
 	printf("MultitaskC raw_ethernet started\n");
 
-	eth_dev.how_probe=PROBE_FIRST;
-	if(eth_probe(&eth_dev)) {
+	if(eth_probe2()) {
 		printf("No adapter found\n");
 		exit(0);
 	}

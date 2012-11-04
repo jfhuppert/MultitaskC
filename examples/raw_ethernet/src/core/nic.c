@@ -313,10 +313,14 @@ static int bootp(void);
 #endif /* RARP_NOT_BOOTP */
 static unsigned short tcpudpchksum(struct iphdr *ip);
 
-
 int eth_probe(struct dev *dev)
 {
 	return probe(dev);
+}
+
+int eth_probe2(void)
+{
+	return probe(&nic.dev);
 }
 
 int eth_poll(int retrieve)
@@ -327,17 +331,10 @@ int eth_poll(int retrieve)
 void eth_transmit(const char *d, unsigned int t, unsigned int s, const void *p)
 {
 	(*nic.transmit)(&nic, d, t, s, p);
-	if (t == ETH_P_IP) twiddle();
 }
 
 void eth_disable(void)
 {
-#ifdef MULTICAST_LEVEL2
-	int i;
-	for(i = 0; i < MAX_IGMP; i++) {
-		leave_group(i);
-	}
-#endif
 	disable(&nic.dev);
 }
 
@@ -506,66 +503,7 @@ static int await_arp(int ival, void *ptr,
 
 int ip_transmit(int len, const void *buf)
 {
-	unsigned long destip;
-	struct iphdr *ip;
-	struct arprequest arpreq;
-	int arpentry, i;
-	int retry;
-
-	ip = (struct iphdr *)buf;
-	destip = ip->dest.s_addr;
-	if (destip == IP_BROADCAST) {
-		eth_transmit(broadcast, ETH_P_IP, len, buf);
-#ifdef MULTICAST_LEVEL1
-	} else if ((destip & htonl(MULTICAST_MASK)) == htonl(MULTICAST_NETWORK)) {
-		unsigned char multicast[6];
-		unsigned long hdestip;
-		hdestip = ntohl(destip);
-		multicast[0] = 0x01;
-		multicast[1] = 0x00;
-		multicast[2] = 0x5e;
-		multicast[3] = (hdestip >> 16) & 0x7;
-		multicast[4] = (hdestip >> 8) & 0xff;
-		multicast[5] = hdestip & 0xff;
-		eth_transmit(multicast, ETH_P_IP, len, buf);
-#endif
-	} else {
-		if (((destip & netmask) !=
-			(arptable[ARP_CLIENT].ipaddr.s_addr & netmask)) &&
-			arptable[ARP_GATEWAY].ipaddr.s_addr)
-				destip = arptable[ARP_GATEWAY].ipaddr.s_addr;
-		for(arpentry = 0; arpentry<MAX_ARP; arpentry++)
-			if (arptable[arpentry].ipaddr.s_addr == destip) break;
-		if (arpentry == MAX_ARP) {
-			printf("%@ is not in my arp table!\n", destip);
-			return(0);
-		}
-		for (i = 0; i < ETH_ALEN; i++)
-			if (arptable[arpentry].node[i])
-				break;
-		if (i == ETH_ALEN) {	/* Need to do arp request */
-			arpreq.hwtype = htons(1);
-			arpreq.protocol = htons(IP);
-			arpreq.hwlen = ETH_ALEN;
-			arpreq.protolen = 4;
-			arpreq.opcode = htons(ARP_REQUEST);
-			memcpy(arpreq.shwaddr, arptable[ARP_CLIENT].node, ETH_ALEN);
-			memcpy(arpreq.sipaddr, &arptable[ARP_CLIENT].ipaddr, sizeof(in_addr));
-			memset(arpreq.thwaddr, 0, ETH_ALEN);
-			memcpy(arpreq.tipaddr, &destip, sizeof(in_addr));
-			for (retry = 1; retry <= MAX_ARP_RETRIES; retry++) {
-				long timeout;
-				eth_transmit(broadcast, ETH_P_ARP, sizeof(arpreq),
-					&arpreq);
-				timeout = rfc2131_sleep_interval(TIMEOUT, retry);
-				if (await_reply(await_arp, arpentry,
-					arpreq.tipaddr, timeout)) goto xmit;
-			}
-			return(0);
-		}
-xmit:
-		eth_transmit(arptable[arpentry].node, ETH_P_IP, len, buf);
-	}
+	printf("ip_transmit(%d,0x%08lx)\n",len,(unsigned long)buf);
 	return 1;
 }
 
