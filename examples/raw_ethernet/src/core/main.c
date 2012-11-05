@@ -121,6 +121,8 @@ unsigned long eth_data;
 	for(;;) {
 		eth_transmit(broadcast,0x0a56,sizeof(eth_data),&eth_data);
 		eth_data+=1;
+		if(eth_poll(1)) printf("got a packet\n");
+		sleep(1);
 	}
 }
 /*------------------------------------------------------------------------------*/
