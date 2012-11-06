@@ -91,6 +91,7 @@ int main(in_call_data_t *data, va_list params)
 {
 char *p;
 unsigned long eth_data;
+unsigned long eth_npackets;
 
 	for(p=_bss;p<_ebss;p++) *p=0;	/* Zero BSS */
 
@@ -118,10 +119,14 @@ unsigned long eth_data;
 	}
 
 	eth_data=0;
+	eth_npackets=0;
 	for(;;) {
 		eth_transmit(broadcast,0x0a56,sizeof(eth_data),&eth_data);
 		eth_data+=1;
-		if(eth_poll(1)) printf("got a packet\n");
+		if(eth_poll(1)) {
+			printf("got a packet %d\r",eth_npackets);
+			eth_npackets+=1;
+		}
 		sleep(1);
 	}
 }
