@@ -5,7 +5,7 @@
 /*---------------------------------------------------------------------------*/
 /*
  *
- * Copyright (C) 1992-2012 Hugo Delchini.
+ * Copyright (C) 1992-2013 Hugo Delchini.
  *
  * This file is part of the MultitaskC project.
  *
