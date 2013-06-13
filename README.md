@@ -2,7 +2,7 @@ MultitaskC
 ==========
 
 The MultitaskC programming language.
-Taken from Hugo Delchini PhD thesis : http://www.delchini.fr/These/THESE_HDELCHINI.pdf
+Taken from Hugo Delchini PhD thesis : http://hugo.delchini.free.fr/These/THESE_HDELCHINI.pdf
 
 The "documentation" directory contains an overview and I will add a tutorial later.
 
